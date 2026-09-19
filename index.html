@@ -3067,12 +3067,49 @@
     checkoutProgressLabel.textContent = 'Subiendo fotos del álbum... ' + completadas + '/' + total;
   }
 
+  /* Mensaje general cuando faltan campos obligatorios: dice QUÉ parte falta
+     (contacto, entrega y/o comprobante) y lleva al primer campo en rojo. */
+  const GRUPOS_CONTACTO = ['group-nombre', 'group-apellido', 'group-correo', 'group-telefono'];
+  const GRUPOS_ENTREGA = ['group-region', 'group-comuna', 'group-direccion'];
+  const grupoConError = (ids) => ids.some((id) => document.getElementById(id).classList.contains('has-error'));
+
+  function mostrarErrorCampos() {
+    const faltas = [];
+    if (grupoConError(GRUPOS_CONTACTO)) faltas.push('tus datos de contacto');
+    if (grupoConError(GRUPOS_ENTREGA)) faltas.push('tus datos de entrega');
+    if (grupoConError(['group-comprobante'])) faltas.push('el comprobante de pago');
+
+    const lista = faltas.length > 1
+      ? faltas.slice(0, -1).join(', ') + ' ni ' + faltas[faltas.length - 1]
+      : (faltas[0] || 'todos los campos necesarios');
+    checkoutErrorEl.textContent = 'No has completado ' + lista + '. Revisa los campos marcados en rojo.';
+    checkoutErrorEl.dataset.tipo = 'campos';
+    checkoutErrorEl.hidden = false;
+
+    const primero = document.querySelector('#checkoutForm .has-error');
+    if (primero) primero.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // Al corregir un campo se le quita el rojo; cuando ya no queda ninguno, se
+  // oculta el mensaje general (los errores de envío del pedido no se tocan).
+  function alCorregirCampo(ev) {
+    const grupo = ev.target.closest && ev.target.closest('.field-float');
+    if (grupo) grupo.classList.remove('has-error');
+    if (checkoutErrorEl.dataset.tipo === 'campos' && !document.querySelector('#checkoutForm .has-error')) {
+      checkoutErrorEl.hidden = true;
+      delete checkoutErrorEl.dataset.tipo;
+    }
+  }
+  form.addEventListener('input', alCorregirCampo);
+  form.addEventListener('change', alCorregirCampo);
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!state.comprobanteFile) { setFieldError('group-comprobante', true); refrescarBotonPago(); return; }
-    if (!validateForm()) return;
+    if (!state.comprobanteFile) { setFieldError('group-comprobante', true); refrescarBotonPago(); }
+    if (!validateForm()) { mostrarErrorCampos(); return; }
 
     checkoutErrorEl.hidden = true;
+    delete checkoutErrorEl.dataset.tipo;
     checkoutProgressRow.hidden = true;
     checkoutProgressFill.style.width = '0%';
     state.enviando = true;
@@ -3159,6 +3196,7 @@
     } catch (err) {
       console.error('Error al enviar el pedido:', err && err.message ? err.message : err);
       checkoutProgressRow.hidden = true;
+      delete checkoutErrorEl.dataset.tipo;
       checkoutErrorEl.textContent =
         'No pudimos completar tu compra (' + (err && err.message ? err.message : 'error desconocido') + '). Intenta de nuevo o escríbenos a ' + CORREO_CONTACTO + '.';
       checkoutErrorEl.hidden = false;
