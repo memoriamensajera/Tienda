@@ -1,0 +1,3174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum de 40 Fotos + Portada Personalizada</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue-deep:#3B62C4;
+    --blue-bg:#AEE0F9;
+    --ink:#242424;
+    --paper:#FBFAF7;
+    --line:#E1E4E0;
+    --success:#2F9E63;
+    --error:#C43B3B;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;}
+  a{color:inherit;}
+
+  /* ---------- header ---------- */
+  .site-header{
+    padding:15px 20px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:center;
+  }
+  .logo{
+    display:inline-block;
+  }
+  .logo img{
+    height:55px;width:auto;display:block;
+  }
+
+  main{max-width:1120px;margin:0 auto;padding:0 20px;}
+
+  /* ---------- screens ---------- */
+  .screen{display:none;}
+  .screen.is-active{display:block;}
+
+  /* ---------- producto ---------- */
+  .product{
+    display:grid;
+    grid-template-columns:1.15fr 1fr;
+    gap:56px;
+    padding:48px 0 0;
+    align-items:start;
+  }
+  .gallery{
+    padding-bottom:10px;
+  }
+
+  /* Escritorio/tablet: en vez de position:sticky (se bugueaba en mobile),
+     la columna de la izquierda queda de altura fija y es la de la derecha
+     la que scrollea adentro suyo, de forma independiente del resto de la
+     página. Nada de esto se activa en mobile: ahí es un solo scroll normal
+     de la página completa, como cualquier sitio. */
+  @media (min-width:861px){
+    .product{
+      height:calc(100vh - 86px); /* 86px = alto real del header (15+55+15+1 borde) */
+    }
+    .gallery{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+    }
+    .gallery-main{
+      flex:1;
+      min-height:0;
+      aspect-ratio:auto;
+    }
+    .product-info{
+      height:100%;
+      overflow-y:auto;
+      /* scrollea igual, pero sin mostrar la barra */
+      scrollbar-width:none;      /* Firefox */
+      -ms-overflow-style:none;   /* Edge/IE viejos */
+    }
+    .product-info::-webkit-scrollbar{
+      display:none; /* Chrome, Safari, Edge nuevo */
+    }
+  }
+
+  @media (max-width:860px){
+    .product{grid-template-columns:1fr;gap:28px;padding:28px 0 0;}
+  }
+
+  /* galería */
+  .gallery-main{
+    border-radius:var(--radius);
+    overflow:hidden;
+    background:#EFEDE6;
+    aspect-ratio:4/5;
+  }
+  .gallery-main img{width:100%;height:100%;object-fit:cover;}
+  .gallery-thumbs{
+    display:flex;
+    gap:10px;
+    margin-top:12px;
+    overflow-x:auto;
+    padding-bottom:2px;
+    flex:none;
+  }
+  .gallery-thumbs button{
+    all:unset;
+    width:74px;height:74px;flex:none;
+    border-radius:8px;overflow:hidden;
+    border:2px solid transparent;
+    cursor:pointer;
+    background:#EFEDE6;
+  }
+  .gallery-thumbs button.is-active{border-color:var(--blue-deep);}
+  .gallery-thumbs img{width:100%;height:100%;object-fit:cover;}
+
+  /* info */
+  .product-info{padding-top:4px;padding-bottom:10px;}
+  .product-title{
+    font-family:'Instrument Serif',serif;
+    font-size:clamp(30px,4vw,42px);
+    line-height:1.05;
+    margin:0 0 14px;
+    color:var(--ink);
+  }
+  .price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:22px;}
+  .price-final{font-size:26px;font-weight:700;color:var(--blue-deep);}
+  .price-prev{font-size:16px;color:#8A8A8A;text-decoration:line-through;}
+  .price-badge{
+    font-size:12px;font-weight:600;color:var(--blue-deep);
+    background:var(--blue-bg);padding:3px 9px;border-radius:99px;
+  }
+
+  .product-desc{font-size:15px;line-height:1.6;color:#4A4A4A;margin-bottom:26px;max-width:52ch;}
+
+  .qty-row{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
+  .qty-label{font-size:14px;font-weight:600;}
+  .qty-stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .qty-stepper button{
+    all:unset;width:38px;height:38px;text-align:center;cursor:pointer;
+    font-size:18px;color:var(--ink);
+  }
+  .qty-stepper button:hover{background:#F1F0EA;}
+  .qty-stepper span{width:40px;text-align:center;font-weight:600;font-size:15px;}
+
+  .buy-btn{
+    width:100%;height:52px;background:var(--ink);color:#fff;border:none;
+    border-radius:8px;font-weight:700;font-size:16px;cursor:pointer;
+    margin-bottom:28px;
+  }
+  .buy-btn:hover{background:#000;}
+
+  details.spec{
+    border-top:1px solid var(--line);
+    padding:14px 0;
+  }
+  details.spec:last-of-type{border-bottom:1px solid var(--line);}
+  details.spec summary{
+    cursor:pointer;font-weight:600;font-size:15px;
+    display:flex;align-items:center;justify-content:space-between;
+    list-style:none;
+  }
+  details.spec summary::-webkit-details-marker{display:none;}
+  details.spec summary::after{
+    content:"+";font-size:20px;font-weight:400;color:var(--blue-deep);
+  }
+  details.spec[open] summary::after{content:"–";}
+  .spec-body{padding-top:12px;font-size:14px;line-height:1.7;color:#4A4A4A;}
+  .spec-body ul{margin:0;padding-left:18px;}
+  .spec-body li{margin-bottom:4px;}
+
+  /* ---------- checkout ---------- */
+  .checkout-wrap{
+    max-width:620px;margin:0 auto;padding:48px 0 80px;
+    font-family:'Poppins',sans-serif;
+  }
+  .back-link{
+    all:unset;cursor:pointer;font-size:14px;color:var(--blue-deep);
+    font-weight:600;margin-bottom:22px;display:inline-flex;align-items:center;gap:6px;
+    font-family:'Poppins',sans-serif;
+  }
+  .checkout-title{
+    font-family:'Instrument Serif',serif;font-size:34px;margin:0 0 6px;color:var(--ink);
+  }
+  .checkout-sub{font-family:'Poppins',sans-serif;font-size:14px;color:#6b6b6b;margin:0 0 24px;}
+
+  .checkout-stage-title{
+    font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;
+    margin:32px 0 16px;color:var(--ink);
+  }
+  .checkout-stage-title:first-child{margin-top:0;}
+
+  .stage-subtitle{
+    font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;color:var(--ink);
+    margin:16px 0 12px;
+  }
+
+  .order-summary{
+    display:flex;gap:14px;align-items:center;
+    background:#F3F2EC;border-radius:8px;padding:14px;margin:28px 0 20px;
+  }
+  .order-summary img{width:56px;height:56px;object-fit:cover;border-radius:6px;flex:none;}
+  .order-summary-text{font-size:14px;}
+  .order-summary-text strong{display:block;font-size:15px;margin-bottom:2px;}
+  .order-summary-price{margin-left:auto;font-weight:700;color:var(--blue-deep);white-space:nowrap;}
+
+  /* ---------- opciones de despacho: una sola caja dividida en 3 ----------
+     La caja recorta (overflow:hidden) y redondea las esquinas. La opción
+     seleccionada dibuja su contorno con un ::after interior (sin cambiar
+     tamaños), y solo redondea las esquinas que coinciden con las de la caja. */
+  .delivery-options-box{
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:22px;
+    background:#fff;
+  }
+  .delivery-option-row{
+    display:flex;align-items:flex-start;gap:12px;cursor:pointer;position:relative;
+    padding:14px 16px;background:#fff;
+  }
+  .delivery-option-row + .delivery-option-row{border-top:1px solid var(--line);}
+  .delivery-option-row input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;}
+  .delivery-option-dot{
+    width:20px;height:20px;border-radius:50%;border:2px solid #C9C6BB;flex:none;margin-top:1px;
+    position:relative;
+  }
+  .delivery-option-dot::after{
+    content:'';position:absolute;inset:4px;border-radius:50%;background:var(--blue-deep);
+    opacity:0;transition:opacity .15s ease;
+  }
+
+  /* seleccionada: fondo suave + contorno azul que tapa las líneas divisorias vecinas */
+  .delivery-option-row:has(input:checked){background:#F8FAFD;z-index:1;}
+  .delivery-option-row:has(input:checked)::after{
+    content:'';position:absolute;inset:-1px 0;pointer-events:none;
+    border:1.5px solid var(--blue-deep);
+  }
+  .delivery-option-row:first-child:has(input:checked)::after{
+    top:0;border-radius:9px 9px 0 0;
+  }
+  .delivery-option-row:last-child:has(input:checked)::after{
+    bottom:0;border-radius:0 0 9px 9px;
+  }
+  .delivery-option-row:has(input:focus-visible){outline:2px solid var(--blue-deep);outline-offset:-4px;}
+  .delivery-option-row:has(input:checked) .delivery-option-dot{border-color:var(--blue-deep);}
+  .delivery-option-row:has(input:checked) .delivery-option-dot::after{opacity:1;}
+  .delivery-option-body{flex:1;display:flex;flex-direction:column;gap:3px;}
+  .delivery-option-title{font-size:14px;font-weight:600;color:var(--ink);}
+  .delivery-option-desc{font-size:12.5px;color:#6b6b6b;}
+  .delivery-option-price{font-size:13px;font-weight:500;color:#8f8f8f;white-space:nowrap;margin-top:1px;}
+
+  /* ---------- tarjeta de pago (Transferencia) ---------- */
+  .payment-option{
+    display:flex;align-items:center;gap:12px;
+    border:1.5px solid var(--blue-deep);background:#F8FAFD;
+    border-radius:10px;padding:14px 16px;margin-bottom:14px;
+  }
+  .payment-option-dot{
+    width:20px;height:20px;border-radius:50%;border:2px solid var(--blue-deep);
+    flex:none;position:relative;
+  }
+  .payment-option-dot::after{content:'';position:absolute;inset:4px;border-radius:50%;background:var(--blue-deep);}
+  .payment-option-title{font-size:14px;font-weight:600;color:var(--ink);}
+  .payment-details{margin-bottom:8px;}
+
+  /* ---------- inputs con floating label ---------- */
+  .field-float{position:relative;margin-bottom:8px;}
+  .field-float input,
+  .field-float select{
+    width:100%;height:54px;padding:22px 13px 8px;border:1px solid var(--line);border-radius:8px;
+    font-size:15px;font-family:inherit;background:#fff;color:var(--ink);
+  }
+  .field-float select{
+    appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b6b6b' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat:no-repeat;background-position:right 13px center;
+  }
+  .field-float label{
+    position:absolute;left:13px;top:16px;font-size:15px;color:#9a9a9a;
+    pointer-events:none;transition:top .15s ease, font-size .15s ease, color .15s ease;
+  }
+  .field-float input:focus + label,
+  .field-float input:not(:placeholder-shown) + label{
+    top:7px;font-size:11px;color:#9a9a9a;font-weight:600;
+  }
+  .field-float input:focus,
+  .field-float select:focus{outline:2px solid var(--blue-deep);outline-offset:1px;}
+  .field-float.has-error input,
+  .field-float.has-error select{border-color:var(--error);}
+  .field-float .field-error{font-size:12.5px;color:var(--error);margin-top:6px;display:none;}
+  .field-float.has-error .field-error{display:block;}
+
+  /* select: siempre muestra su valor, así que el label queda fijo arriba */
+  .field-float.is-select label{top:7px;font-size:11px;color:#9a9a9a;font-weight:600;}
+
+  /* etiqueta simple (no flotante) para el teléfono y el país, que son casos compuestos */
+  .field-float .static-label-up{
+    position:absolute;left:13px;top:7px;font-size:11px;font-weight:600;color:#9a9a9a;
+    pointer-events:none;
+  }
+
+  /* teléfono: prefijo +56 fijo a la izquierda y label flotante igual a los demás campos */
+  .field-float.has-prefix input{padding-left:70px;}
+  .field-float.has-prefix label{left:70px;}
+  .field-float .phone-prefix{
+    position:absolute;left:1px;top:1px;width:56px;height:52px;z-index:1;
+    display:flex;align-items:center;justify-content:center;pointer-events:none;
+    background:#F3F2EC;border-right:1px solid var(--line);border-radius:7px 0 0 7px;
+    font-size:15px;font-weight:600;color:#6b6b6b;
+  }
+
+  .form-group{margin-bottom:20px;}
+  .form-group label{
+    display:block;font-size:13px;font-weight:600;margin-bottom:7px;
+  }
+  .form-group input[type=text],
+  .form-group input[type=email],
+  .form-group input[type=tel],
+  .form-group textarea{
+    width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:8px;
+    font-size:15px;font-family:inherit;background:#fff;color:var(--ink);
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder{
+    color:#B7B4A9; /* más claro que el texto real, para que no parezca ya escrito */
+    opacity:1; /* Firefox baja la opacidad del placeholder por defecto */
+  }
+  .form-group input:focus,
+  .form-group textarea:focus{outline:2px solid var(--blue-deep);outline-offset:1px;}
+  .form-row{display:flex;gap:14px;}
+  .form-row .form-group{flex:1;}
+  .form-row .field-float{flex:1;min-width:0;}
+  .field-error{font-size:12.5px;color:var(--error);margin-top:6px;display:none;}
+  .form-group.has-error input,
+  .form-group.has-error .upload-box{border-color:var(--error);}
+  .form-group.has-error .field-error{display:block;}
+
+  .upload-box{
+    border:1.5px dashed #B9C4D6;border-radius:8px;padding:20px;
+    text-align:center;cursor:pointer;background:#F8FAFD;
+  }
+  .upload-box.has-file{border-style:solid;border-color:var(--blue-deep);background:#fff;padding:12px;}
+  .upload-box input[type=file]{display:none;}
+  .upload-hint{font-size:13px;color:#6b6b6b;}
+  .upload-hint strong{color:var(--blue-deep);}
+  .upload-preview{display:flex;align-items:center;gap:12px;text-align:left;}
+  .upload-preview img{width:52px;height:52px;object-fit:cover;border-radius:6px;flex:none;}
+  .upload-preview-name{font-size:13px;font-weight:600;overflow-wrap:anywhere;}
+  .upload-remove{
+    all:unset;margin-left:auto;font-size:13px;color:var(--error);cursor:pointer;font-weight:600;
+  }
+
+  .submit-btn{
+    width:100%;height:52px;background:var(--blue-deep);color:#fff;border:none;
+    border-radius:8px;font-weight:700;font-size:16px;cursor:pointer;margin-top:8px;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .submit-hint{font-size:12.5px;color:#8a8a8a;margin:10px 0 0;text-align:center;}
+  .submit-hint[hidden]{display:none;}
+  .submit-btn .spinner{
+    width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.5);
+    border-top-color:#fff;animation:spin .7s linear infinite;display:none;
+  }
+  .submit-btn.is-loading .spinner{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .form-note{font-size:12.5px;color:#8a8a8a;margin-top:14px;text-align:center;line-height:1.55;}
+  .form-note a{color:var(--blue-deep);font-weight:600;text-decoration:underline;}
+
+  .checkout-error{
+    font-size:13px;color:var(--error);background:#FDF1F1;border:1px solid #F3D4D4;
+    border-radius:8px;padding:12px 14px;margin-bottom:16px;text-align:center;
+  }
+
+  .checkout-progress{margin-bottom:16px;}
+  .checkout-progress-track{
+    width:100%;height:8px;border-radius:99px;background:#EDEBE3;overflow:hidden;
+  }
+  .checkout-progress-fill{
+    height:100%;width:0%;border-radius:99px;background:var(--blue-deep);
+    transition:width .25s ease;
+  }
+  .checkout-progress-label{
+    display:block;margin-top:6px;font-size:12.5px;color:#6b6b6b;text-align:center;
+  }
+
+  .optional-tag{font-weight:400;color:#9a9a9a;font-size:12px;}
+
+  .country-fixed{
+    display:flex;align-items:center;gap:8px;
+    height:54px;padding:22px 13px 8px;border:1px solid var(--line);border-radius:8px;
+    background:#F3F2EC;color:#4A4A4A;font-size:15px;font-weight:600;
+  }
+
+  .form-group select{
+    width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:8px;
+    font-size:15px;font-family:inherit;background:#fff;color:var(--ink);
+    appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b6b6b' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat:no-repeat;background-position:right 13px center;
+  }
+  .form-group select:focus{outline:2px solid var(--blue-deep);outline-offset:1px;}
+  .form-group.has-error select{border-color:var(--error);}
+
+  .bank-info-box{
+    background:#EFF6FF;border:1px solid #D7E7FB;border-radius:10px;
+    padding:14px 16px;margin-bottom:14px;
+  }
+  .bank-info-title{
+    margin:0 0 10px;font-size:13px;font-weight:700;color:var(--blue-deep);
+  }
+  .bank-info-grid{
+    display:grid;grid-template-columns:auto 1fr;column-gap:14px;row-gap:6px;
+    font-size:13.5px;
+  }
+  .bank-info-grid span{color:#5b6b86;min-width:0;}
+  .bank-info-grid strong{color:#1f3a66;font-weight:700;min-width:0;overflow-wrap:anywhere;}
+  .payment-details{min-width:0;}
+  .payment-details.has-error .upload-box{border-color:var(--error);}
+  .payment-details.has-error > .field-error{display:block;}
+  .upload-box{display:block;min-width:0;}
+  .upload-hint{line-height:1.55;}
+  .upload-preview{min-width:0;}
+  .upload-preview-name{min-width:0;flex:1;}
+  @media (max-width:520px){
+    .form-row{flex-direction:column;gap:0;}
+    .bank-info-grid{grid-template-columns:minmax(0, .85fr) minmax(0, 1.15fr);column-gap:10px;}
+    .bank-info-box{padding:13px;}
+    .upload-box{padding:16px 12px;}
+  }
+
+  /* separador entre la ficha técnica y el wizard de armado del álbum */
+  .album-wizard-heading{margin:26px 0 14px;}
+  .album-wizard-kicker{
+    font-size:13px;font-weight:600;color:var(--blue-deep);margin:0;
+  }
+  .album-wizard{margin:0;} /* el wizard trae su propio max-width:511px */
+
+  /* ---------- confirmación ---------- */
+  .confirm-wrap{
+    max-width:520px;margin:0 auto;padding:90px 0;text-align:center;
+  }
+  .confirm-icon{
+    width:64px;height:64px;border-radius:50%;background:var(--success);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    margin:0 auto 24px;
+  }
+  .confirm-title{font-family:'Instrument Serif',serif;font-size:36px;margin:0 0 12px;}
+  .confirm-text{font-size:15px;color:#4A4A4A;line-height:1.6;margin:0 0 6px;}
+  .confirm-order{
+    display:inline-block;margin:22px 0;font-size:13px;letter-spacing:.4px;
+    background:#F3F2EC;padding:8px 16px;border-radius:99px;color:#6b6b6b;
+  }
+  .confirm-order strong{color:var(--ink);}
+  .confirm-back{
+    display:inline-block;margin-top:14px;font-size:14px;font-weight:600;
+    color:var(--blue-deep);cursor:pointer;text-decoration:underline;background:none;border:none;
+  }
+
+  /* =====================================================================
+     Estilos del wizard de álbum de fotos (album-fotos.css, sin cambios)
+     ===================================================================== */
+.album-wizard{
+  --blue-bg:#AEE0F9;
+  --blue-bg-deep:#3B62C4;
+  --blue-text:#3B62C4;
+  --ink:#242424;
+  --radius-lg:22px;
+  --radius-btn:8px;
+  max-width:511px;
+  width:100%;
+  height:686px;
+  max-height:calc(100vh - 32px);
+  margin:0 auto;
+  background:var(--blue-bg);
+  border-radius:9px;
+  padding:16px 16px 22px;
+  position:relative;
+  overflow-y:auto;
+  overflow-x:hidden;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  font-family:'Inter',sans-serif;
+  transition:background .35s ease;
+}
+.album-wizard *{box-sizing:border-box;}
+.album-wizard.album-step-3{background:var(--blue-bg-deep);}
+
+/* progreso */
+.album-wizard .album-progress-bar{display:flex;gap:10px;margin-bottom:18px;}
+.album-wizard .album-progress-bar span{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,0.35);transition:background .3s ease;}
+.album-wizard .album-progress-bar span.album-is-done{background:#fff;}
+
+/* paneles */
+.album-wizard .album-panel{display:none;flex:1;flex-direction:column;min-height:0;opacity:0;transition:opacity .22s ease;}
+.album-wizard .album-panel.album-is-active{display:flex;}
+.album-wizard .album-panel.album-is-active.album-is-shown{opacity:1;}
+
+.album-wizard .album-title{
+  font-family:'Instrument Serif',serif;
+  font-style:normal;
+  color:var(--blue-text);
+  font-weight:400;
+  text-align:center;
+  font-size:clamp(44px,14vw,80px);
+  line-height:90%;
+  margin:0 0 40px;
+}
+.album-wizard .album-hint{
+  text-align:center;
+  color:var(--blue-text);
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+  margin:0 0 5px;
+}
+
+/* ---- paso 1 ---- */
+.album-wizard .album-upload-card{
+  background:#fff;
+  border-radius:var(--radius-lg);
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  padding:18px;
+  position:relative;
+}
+.album-wizard .album-upload-card.album-is-dragover{
+  background-image:
+    repeating-linear-gradient(90deg, var(--blue-text) 0 8px, transparent 0 16px),
+    repeating-linear-gradient(90deg, var(--blue-text) 0 8px, transparent 0 16px),
+    repeating-linear-gradient(0deg, var(--blue-text) 0 8px, transparent 0 16px),
+    repeating-linear-gradient(0deg, var(--blue-text) 0 8px, transparent 0 16px);
+  background-position:0 0, 0 100%, 0 0, 100% 0;
+  background-size:16px 2px, 16px 2px, 2px 16px, 2px 16px;
+  background-repeat:repeat-x, repeat-x, repeat-y, repeat-y;
+  animation:album-marching-ants .6s linear infinite;
+}
+.album-wizard .album-upload-card.album-is-dragover [data-empty-state],
+.album-wizard .album-upload-card.album-is-dragover [data-filled-state]{
+  opacity:.35;
+  transition:opacity .15s ease;
+}
+@keyframes album-marching-ants{
+  to{background-position:16px 0, -16px 100%, 0 -16px, 100% 16px;}
+}
+.album-wizard .album-upload-card.album-is-empty{
+  border:2px dashed #90AEE8;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  gap:16px;
+}
+.album-wizard .album-upload-card.album-is-empty.album-is-dragover{
+  border-color:transparent;
+}
+.album-wizard .album-filled-state{display:flex;flex-direction:column;flex:1;min-height:0;}
+
+.album-wizard .album-status-header{
+  display:flex;
+  align-items:center;
+}
+.album-wizard .album-status-box{
+  flex:0 1 70%;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  justify-content:flex-start;
+  font-family:'Inter',sans-serif;font-size:14px;color:var(--blue-text);font-weight:500;
+}
+.album-wizard .album-counter-box{
+  flex:0 1 30%;
+  display:flex;
+  justify-content:right;
+  align-items:center;
+}
+
+.album-wizard .album-status-box .album-ring{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid #BFD6F5;border-top-color:var(--blue-text);
+  animation:album-spin .8s linear infinite;flex:none;
+}
+.album-wizard .album-status-box .album-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--blue-text);flex:none;}
+.album-wizard .album-status-box .album-dot.album-is-filled{background:var(--blue-text);}
+@keyframes album-spin{to{transform:rotate(360deg);}}
+
+.album-wizard .album-counter{
+  font-family:'Inter',sans-serif;font-weight:800;font-size:33px;
+  color:var(--blue-text);opacity:.3;
+}
+
+.album-wizard .album-select-btn{
+  background:var(--ink);color:#fff;border:none;
+  height:50px;padding:0 28px;width:90%;max-width:100%;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:var(--radius-btn);font-weight:700;font-size:16px;
+  cursor:pointer;font-family:'Inter',sans-serif;
+}
+
+.album-wizard .album-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+  grid-auto-rows:min-content;
+  grid-auto-flow:row;
+  gap:8px;
+  overflow-x:hidden;
+  overflow-y:auto;
+  padding-right:6px;
+  flex:1;
+  min-height:0;
+  align-content:start;
+  scrollbar-width:thin;
+  scrollbar-color:#9fb4c6 #eef3f6;
+}
+.album-wizard .album-grid::-webkit-scrollbar{width:6px;height:6px;}
+.album-wizard .album-grid::-webkit-scrollbar-track{background:#eef3f6;border-radius:99px;}
+.album-wizard .album-grid::-webkit-scrollbar-thumb{background:#9fb4c6;border-radius:99px;}
+
+.album-wizard .album-tile{
+  position:relative;min-width:0;aspect-ratio:2/3;border-radius:8px;overflow:hidden;
+  background:#eef3f6;border:2px solid transparent;cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+}
+.album-wizard .album-tile img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none;user-drag:none;}
+.album-wizard .album-tile.album-is-uploading img{opacity:.55;}
+.album-wizard .album-tile.album-is-selected{border-color:var(--ink);}
+.album-wizard .album-tile .album-badge{
+  position:absolute;top:5px;left:5px;background:#111;color:#fff;
+  font-size:.6rem;font-weight:600;padding:2px 6px;border-radius:5px;
+}
+.album-wizard .album-tile .album-badge.album-is-error{background:#E4572E;}
+.album-wizard .album-tile .album-check{
+  position:absolute;top:5px;right:5px;width:16px;height:16px;background:#111;color:#fff;
+  border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.6rem;
+}
+.album-wizard .album-tile .album-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;
+  align-items:flex-end;justify-content:center;padding-bottom:8px;
+}
+.album-wizard .album-tile.album-is-selected .album-overlay{display:flex;}
+.album-wizard .album-tile.album-is-selected.album-is-draggable{cursor:grab;touch-action:none;}
+.album-wizard .album-tile.album-is-selected.album-is-draggable.album-is-dragging{cursor:grabbing;}
+.album-wizard .album-tile.album-is-selected.album-is-draggable .album-icon-btn{cursor:pointer;}
+.album-wizard .album-tile .album-discard{
+  background:#E4572E;color:#fff;border:none;font-size:.65rem;font-weight:700;
+  padding:4px 8px;border-radius:6px;cursor:pointer;
+}
+.album-wizard .album-tile-actions{display:flex;gap:6px;}
+.album-wizard .album-icon-btn{
+  width:26px;height:26px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,.92);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;flex:none;
+}
+.album-wizard .album-icon-btn svg{width:14px;height:14px;}
+.album-wizard .album-icon-btn-danger{background:#E4572E;color:#fff;}
+.album-wizard .album-tile.album-add-tile{
+  background:#f1f5f8;border:1.5px dashed #c7d8e6;
+  display:flex;align-items:center;justify-content:center;color:#9fb4c6;font-size:1.6rem;
+}
+
+.album-wizard .album-cta-row{margin-top:16px;display:flex;justify-content:flex-end;}
+.album-wizard .album-btn{
+  font-family:'Inter',sans-serif;font-weight:400;border-radius:var(--radius-btn);
+  height:50px;padding:0 26px;border:none;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.album-wizard .album-btn-primary{background:var(--ink);color:#fff;}
+.album-wizard .album-btn-primary:disabled{background:#DBF0FF;color:rgba(255,255,255,.9);cursor:not-allowed;}
+.album-wizard .album-btn-outline{background:transparent;border:1px solid var(--ink);color:var(--ink);}
+.album-wizard .album-panel[data-panel="1"] .album-cta-row .album-btn{width:100%;}
+.album-wizard .album-step2-actions{margin-top:auto;display:flex;gap:14px;align-items:stretch;}
+.album-wizard .album-btn-back-square{
+  width:50px;height:50px;flex:none;border-radius:var(--radius-btn);
+  border:1px solid var(--ink);background:transparent;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.album-wizard .album-btn-cover-select{
+  flex:1;height:50px;background:var(--ink);color:#fff;border:none;
+  border-radius:var(--radius-btn);font-weight:400;font-size:16px;font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+
+/* ---- paso 2 ---- */
+.album-wizard .album-stamp-zone{
+  position:relative;height:340px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;touch-action:pan-y;
+}
+.album-wizard .album-ghost-photo{
+  position:absolute;width:130px;height:190px;border-radius:4px;overflow:hidden;
+  opacity:.45;filter:blur(1.5px) grayscale(.3);display:none;
+}
+.album-wizard .album-ghost-photo.album-is-visible{display:block;}
+.album-wizard .album-ghost-photo.album-next{right:2%;transform:rotate(4deg);}
+.album-wizard .album-ghost-photo.album-prev{left:2%;transform:rotate(-4deg);}
+.album-wizard .album-ghost-photo img{width:100%;height:100%;object-fit:cover;}
+.album-wizard .album-stamp-frame{position:relative;width:190px;aspect-ratio:470/749;z-index:2;user-select:none;}
+.album-wizard .album-stamp-frame img.album-stamp-frame-bg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;pointer-events:none;}
+.album-wizard .album-stamp-photo-mask{
+  position:absolute;top:7%;left:8%;width:84%;height:86%;
+  overflow:hidden;border-radius:2px;z-index:2;
+}
+.album-wizard .album-stamp-photo-mask img.album-stamp-photo{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+}
+.album-wizard .album-stamp-photo-mask canvas.album-stamp-edit-canvas{
+  position:absolute;inset:0;width:100%;height:100%;display:none;z-index:2;
+}
+.album-wizard .album-stamp-photo-mask.album-is-editing canvas.album-stamp-edit-canvas{display:block;}
+.album-wizard .album-stamp-photo-mask.album-is-editing{touch-action:none;}
+.album-wizard .album-stamp-edit{
+  position:absolute;inset:0;z-index:3;
+  background:rgba(0,0,0,.35);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  gap:8px;padding-bottom:10px;
+  opacity:0;pointer-events:none;transition:opacity .18s ease;
+}
+.album-wizard .album-stamp-edit.album-is-visible{opacity:1;}
+.album-wizard .album-stamp-edit .album-zoom-row,
+.album-wizard .album-stamp-edit .album-tile-actions{pointer-events:auto;}
+.album-wizard .album-zoom-row{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.95);border-radius:99px;padding:4px 10px;
+}
+.album-wizard .album-zoom-row button{
+  width:20px;height:20px;border-radius:50%;border:none;background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+  line-height:1;cursor:pointer;flex:none;
+}
+.album-wizard .album-zoom-row button:disabled{opacity:.35;cursor:not-allowed;}
+.album-wizard .album-zoom-label{
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:700;color:var(--ink);
+  min-width:32px;text-align:center;
+}
+.album-wizard .album-stamp-nav{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.7);
+  color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.album-wizard .album-stamp-nav.album-prev{left:6%;}
+.album-wizard .album-stamp-nav.album-next{right:6%;}
+.album-wizard .album-stamp-nav svg{width:18px;height:18px;}
+
+/* ---- paso 3 ---- */
+.album-wizard .album-eyebrow{color:#fff;text-align:center;font-family:'Inter',sans-serif;font-size:14px;margin:30px 0px 10px 0px;}
+.album-wizard .album-final-title{
+  font-family:'Instrument Serif',serif;font-style:normal;font-weight:400;text-align:center;
+  font-size:clamp(40px,14vw,80px);line-height:90%;margin:0 0 22px;
+  color:var(--blue-bg);
+}
+
+.album-wizard .album-stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.album-wizard .album-group{position:relative;width:190px;aspect-ratio:285/400;}
+.album-wizard .album-group img.album-bg{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+  box-shadow:0 5px 17px rgba(0,0,0,.25);border-radius:2px;z-index:2;
+}
+.album-wizard .album-group .album-cover-photo{
+  position:absolute;left:35.5%;top:30%;width:29%;height:37%;object-fit:cover;z-index:1;
+}
+.album-wizard .album-decor-stamps{
+  position:absolute;left:-50%;top:-10%;width:150px;transform:rotate(-6deg);opacity:.95;z-index:3;
+}
+.album-wizard .album-decor-letras{
+  position:absolute;right:-70%;bottom:-5%;z-index:1;transform:rotate(314deg);
+}
+
+.album-wizard .album-final-actions{
+  margin-top:16px;display:flex;gap:10px;align-items:stretch;
+  width:100%;max-width:500px;margin-left:auto;margin-right:auto;
+}
+.album-wizard .album-btn-back-icon{
+  width:50px;height:50px;flex:none;border-radius:var(--radius-btn);border:1px solid #fff;
+  background:transparent;color:#fff;font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;
+}
+.album-wizard .album-btn-buy{
+  flex:1;height:50px;background:#fff;color:var(--blue-text);border:none;
+  border-radius:var(--radius-btn);font-weight:700;font-size:16px;font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+}
+.album-wizard .album-btn-buy svg{width:20px;height:20px;flex:none;}
+
+.album-wizard .album-cart-error{color:#c62828;font-size:.85rem;text-align:center;margin-top:10px;}
+.album-wizard input[type=file]{display:none;}
+
+/* ---- confeti (al llegar al paso 3) ---- */
+.album-wizard .album-confetti{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:35;
+}
+.album-wizard .album-confetti-piece{
+  position:absolute;top:-12px;border-radius:1px;
+  animation-name:album-confetti-fall;
+  animation-timing-function:cubic-bezier(.2,.6,.4,1);
+  animation-fill-mode:forwards;
+}
+@keyframes album-confetti-fall{
+  0%{transform:translate(0,0) rotate(0deg);opacity:1;}
+  60%{transform:translate(var(--drift), var(--land-y)) rotate(var(--rotate-end));opacity:1;}
+  100%{transform:translate(var(--drift), var(--land-y)) rotate(var(--rotate-end));opacity:0;}
+}
+
+/* ---- toast (aviso de límite / foto eliminada) ---- */
+.album-wizard .album-toast{
+  position:absolute;left:14px;right:14px;bottom:14px;z-index:40;
+  background:#FFF4E5;border:1px solid #F0C48A;color:#7A3E00;border-radius:10px;
+  padding:12px 14px;font-family:'Inter',sans-serif;font-size:13px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+.album-wizard .album-toast.album-is-visible{opacity:1;transform:translateY(0);pointer-events:auto;}
+.album-wizard .album-toast button{
+  background:none;border:none;color:#7A3E00;font-weight:700;font-size:13px;
+  cursor:pointer;text-decoration:underline;flex:none;font-family:'Inter',sans-serif;
+}
+
+/* ---- overlay de subida (al presionar Comprar) ---- */
+.album-wizard .album-upload-overlay{
+  position:absolute;inset:0;z-index:30;
+  background:rgba(36,36,36,.45);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+  border-radius:9px;
+}
+.album-wizard .album-upload-overlay.album-is-visible{opacity:1;pointer-events:auto;}
+.album-wizard .album-upload-box{
+  background:#fff;border-radius:16px;padding:30px 26px;width:min(280px,82%);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  box-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+.album-wizard .album-upload-progress{
+  width:100%;display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.album-wizard .album-upload-bar-track{
+  width:100%;height:8px;border-radius:99px;background:#E7EEFA;overflow:hidden;
+}
+.album-wizard .album-upload-bar-fill{
+  height:100%;width:0%;border-radius:99px;background:var(--blue-text);
+  transition:width .3s ease;
+}
+.album-wizard .album-upload-text{
+  margin:0;font-family:'Inter',sans-serif;font-size:13px;color:var(--blue-text);
+  font-weight:600;text-align:center;
+}
+.album-wizard .album-upload-check{
+  display:none;width:52px;height:52px;border-radius:50%;
+  background:var(--blue-text);color:#fff;align-items:center;justify-content:center;
+}
+.album-wizard .album-upload-check svg{width:26px;height:26px;}
+.album-wizard .album-upload-box.album-is-done .album-upload-progress{display:none;}
+.album-wizard .album-upload-box.album-is-done .album-upload-check{
+  display:flex;animation:album-pop .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes album-pop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#" class="logo" id="logoLink"><img src="https://i.ibb.co/rGKjj409/pajaro-02.png" alt="Memoria Mensajera"></a>
+</header>
+
+<main>
+
+  <!-- ============ PANTALLA 1: PRODUCTO ============ -->
+  <section class="screen is-active" id="screen-product">
+    <div class="product">
+      <div class="gallery">
+        <div class="gallery-main">
+          <img id="galleryMainImg" src="https://i.ibb.co/PsPkKDVs/album1.webp" alt="Álbum de fotos personalizado">
+        </div>
+        <div class="gallery-thumbs" id="galleryThumbs"></div>
+      </div>
+
+      <div class="product-info">
+        <h1 class="product-title">Álbum de 40 Fotos + Portada Personalizada</h1>
+
+        <div class="price-row">
+          <span class="price-final" id="priceFinal">$9.990</span>
+          <span class="price-prev" id="pricePrev">$13.990</span>
+          <span class="price-badge" id="priceBadge">OFF</span>
+        </div>
+
+        <p class="product-desc">
+          No pierdas tus recuerdos entre las miles de fotos en tu celular,
+          materializa tus memorias con este álbum. Eliges hasta 40 fotos,
+          escoges la portada y nosotros armamos el resto.
+        </p>
+
+        <div class="qty-row">
+          <span class="qty-label">Número de copias</span>
+          <div class="qty-stepper">
+            <button type="button" id="qtyMinus" aria-label="Restar">−</button>
+            <span id="qtyValue">1</span>
+            <button type="button" id="qtyPlus" aria-label="Sumar">+</button>
+          </div>
+        </div>
+
+        <p class="form-note" style="text-align:left;margin:-10px 0 22px;">
+          Ideal para regalos y recuerdos compartidos. Si compras más de 1 copia, se imprime el mismo álbum que armes abajo.
+        </p>
+
+        <details class="spec">
+          <summary>Ficha técnica</summary>
+          <div class="spec-body">
+            <ul>
+              <li>Dimensiones: 10 × 15 cm</li>
+              <li>Papel fotográfico glossy de alta resolución de 115g/m²</li>
+              <li>40 fotos + portada personalizada</li>
+              <li>Páginas de polipropileno de encuadernación térmica</li>
+              <li>Portada troquelada de opalina texturada de 220 g/m²</li>
+              <li>Envío a todo Chile</li>
+            </ul>
+          </div>
+        </details>
+
+        <div class="album-wizard-heading">
+          <p class="album-wizard-kicker">Arma tu álbum</p>
+        </div>
+
+      <div class="album-wizard"
+           id="album-wizard-main"
+           data-imgbb-proxy-url="https://album-imgbb-proxy.memoriamensajera.workers.dev/"
+           data-num-photos="40"
+           data-target-w="1102"
+           data-target-h="1654"
+           data-stamp-frame-src="https://i.ibb.co/m5nRZLr3/estampilla-png.png"
+           data-album-src="https://i.ibb.co/Gr5pbgG/album.png"
+           data-decor-top-src="https://i.ibb.co/b5KTms78/estampillas.png"
+           data-decor-signature-src="https://i.ibb.co/RkwTCc2r/letras.png"
+           data-expiration-days="7">
+
+        <div class="album-progress-bar">
+          <span data-seg="1"></span><span data-seg="2"></span><span data-seg="3"></span>
+        </div>
+
+        <!-- PASO 1 -->
+        <section class="album-panel album-is-active" data-panel="1">
+          <div class="album-upload-card album-is-empty" id="uploadCard-main">
+            <div data-empty-state>
+              <p class="album-title">Sube Tus<br>40 Fotos</p>
+              <p class="album-hint" style="margin-bottom:14px;">Arrastra o selecciona tus fotos</p>
+              <label class="album-select-btn">Seleccionar fotos<input type="file" data-file-input accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple></label>
+            </div>
+
+            <div data-filled-state class="album-filled-state" style="display:none;">
+              <div class="album-status-header">
+                <div class="album-status-box" data-status-row></div>
+                <div class="album-counter-box"><span class="album-counter" data-counter>0/40</span></div>
+              </div>
+              <div class="album-grid" data-grid></div>
+            </div>
+
+            <div class="album-toast" data-toast hidden>
+              <span data-toast-text></span>
+              <button type="button" data-toast-undo hidden>Deshacer</button>
+            </div>
+          </div>
+
+          <div class="album-cta-row">
+            <button type="button" class="album-btn album-btn-primary" data-go-step="2" disabled>Continuar &rarr;</button>
+          </div>
+        </section>
+
+        <!-- PASO 2 -->
+        <section class="album-panel" data-panel="2">
+          <div class="album-stamp-zone" data-stamp-zone>
+            <button type="button" class="album-stamp-nav album-prev" data-prev-photo aria-label="Foto anterior">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="album-ghost-photo album-prev" data-ghost-prev><img data-ghost-prev-img src="" alt=""></div>
+            <div class="album-stamp-frame">
+              <img class="album-stamp-frame-bg" data-stamp-frame-bg src="" alt="">
+              <div class="album-stamp-photo-mask">
+                <img class="album-stamp-photo" data-stamp-photo src="" alt="Foto seleccionada">
+                <canvas class="album-stamp-edit-canvas" data-stamp-canvas></canvas>
+                <div class="album-stamp-edit" data-stamp-edit>
+                  <div class="album-zoom-row">
+                    <button type="button" data-zoom-out aria-label="Alejar">&#8722;</button>
+                    <span class="album-zoom-label" data-zoom-label>100%</span>
+                    <button type="button" data-zoom-in aria-label="Acercar">+</button>
+                  </div>
+                  <div class="album-tile-actions">
+                    <button type="button" class="album-icon-btn" data-cover-rotate title="Rotar">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    </button>
+                    <button type="button" class="album-icon-btn" data-cover-flip title="Espejo">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"></path><path d="M16 8l4 4-4 4"></path><path d="M8 8l-4 4 4 4"></path></svg>
+                    </button>
+                    <button type="button" class="album-icon-btn" data-cover-close title="Cerrar">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="album-ghost-photo album-next" data-ghost-next><img data-ghost-next-img src="" alt=""></div>
+            <button type="button" class="album-stamp-nav album-next" data-next-photo aria-label="Siguiente foto">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+          <p class="album-hint">Desliza para elegir tu foto favorita</p>
+          <p class="album-title">Selecciona<br>La Portada</p>
+          <div class="album-step2-actions">
+            <button type="button" class="album-btn-back-square" data-go-step="1" aria-label="Volver">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button type="button" class="album-btn-cover-select" data-go-step="3">Elegir esta portada &rarr;</button>
+          </div>
+        </section>
+
+        <!-- PASO 3 -->
+        <section class="album-panel" data-panel="3">
+          <p class="album-eyebrow">Tus recuerdos están más cerca</p>
+          <p class="album-final-title">Tu Album<br>Ya Esta Listo</p>
+          <div class="album-stage">
+            <div class="album-group">
+              <img class="album-decor-stamps" data-decor-top src="" alt="">
+              <img class="album-bg" data-album-bg src="" alt="">
+              <img class="album-cover-photo" data-final-cover src="" alt="Portada elegida">
+              <img class="album-decor-letras" data-decor-signature src="" alt="">
+            </div>
+          </div>
+          <div class="album-final-actions">
+            <button type="button" class="album-btn-back-icon" data-go-step="2">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button type="button" class="album-btn-buy" data-add-to-cart>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+              Comprar
+            </button>
+          </div>
+          <p class="album-cart-error" data-cart-error hidden></p>
+        </section>
+
+        <div class="album-confetti" data-confetti></div>
+
+        <div class="album-upload-overlay" data-upload-overlay hidden>
+          <div class="album-upload-box" data-upload-box>
+            <div class="album-upload-progress">
+              <div class="album-upload-bar-track">
+                <div class="album-upload-bar-fill" data-upload-bar></div>
+              </div>
+              <p class="album-upload-text" data-upload-text>Subiendo tus fotos...</p>
+            </div>
+            <div class="album-upload-check" data-upload-check>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 2: CHECKOUT ============ -->
+  <section class="screen" id="screen-checkout">
+    <div class="checkout-wrap">
+      <button class="back-link" id="backToProduct">&larr; Volver al producto</button>
+      <h2 class="checkout-title">Completa tu pedido</h2>
+      <p class="checkout-sub">Te pediremos tus datos de envío y el comprobante de tu pago.</p>
+
+      <div class="order-summary">
+        <img id="orderSummaryImgTop" src="https://i.ibb.co/PsPkKDVs/album1.webp" alt="">
+        <div class="order-summary-text">
+          <strong>Álbum de 40 Fotos + Portada Personalizada</strong>
+          <span id="orderQtyTextTop">1 copia</span>
+        </div>
+        <span class="order-summary-price" id="orderTotalTextTop">$9.990</span>
+      </div>
+
+      <form id="checkoutForm" novalidate>
+        <h2 class="checkout-stage-title">Contacto</h2>
+
+        <div class="form-row">
+          <div class="field-float" id="group-nombre">
+            <input type="text" id="nombre" name="nombre" autocomplete="given-name" placeholder=" ">
+            <label for="nombre">Nombre</label>
+            <div class="field-error">Ingresa tu nombre.</div>
+          </div>
+          <div class="field-float" id="group-apellido">
+            <input type="text" id="apellido" name="apellido" autocomplete="family-name" placeholder=" ">
+            <label for="apellido">Apellido</label>
+            <div class="field-error">Ingresa tu apellido.</div>
+          </div>
+        </div>
+
+        <div class="field-float" id="group-correo">
+          <input type="email" id="correo" name="correo" autocomplete="email" placeholder=" ">
+          <label for="correo">Correo electrónico</label>
+          <div class="field-error">Ingresa un correo válido.</div>
+        </div>
+
+        <div class="field-float has-prefix" id="group-telefono">
+          <span class="phone-prefix">+56</span>
+          <input type="tel" id="telefono" name="telefono" autocomplete="tel-national" inputmode="tel" placeholder=" ">
+          <label for="telefono">Teléfono</label>
+          <div class="field-error">Ingresa tu teléfono.</div>
+        </div>
+
+        <h2 class="checkout-stage-title">Entrega</h2>
+
+        <div class="field-float is-select">
+          <div class="country-fixed">
+            <span>🇨🇱</span> Chile
+          </div>
+          <label class="static-label-up">País / Región</label>
+        </div>
+
+        <div class="field-float is-select" id="group-region">
+          <select id="region" name="region" autocomplete="address-level1">
+            <option value="" disabled selected></option>
+            <option>Arica y Parinacota</option>
+            <option>Tarapacá</option>
+            <option>Antofagasta</option>
+            <option>Atacama</option>
+            <option>Coquimbo</option>
+            <option>Valparaíso</option>
+            <option>Metropolitana de Santiago</option>
+            <option>Libertador General Bernardo O'Higgins</option>
+            <option>Maule</option>
+            <option>Ñuble</option>
+            <option>Biobío</option>
+            <option>La Araucanía</option>
+            <option>Los Ríos</option>
+            <option>Los Lagos</option>
+            <option>Aysén</option>
+            <option>Magallanes y de la Antártica Chilena</option>
+          </select>
+          <label for="region">Región</label>
+          <div class="field-error">Selecciona tu región.</div>
+        </div>
+
+        <div class="field-float" id="group-comuna">
+          <input type="text" id="comuna" name="comuna" autocomplete="address-level2" placeholder=" ">
+          <label for="comuna">Comuna</label>
+          <div class="field-error">Ingresa tu comuna.</div>
+        </div>
+
+        <div class="field-float" id="group-direccion">
+          <input type="text" id="direccion" name="direccion" autocomplete="address-line1" placeholder=" ">
+          <label for="direccion">Dirección: Calle y Número</label>
+          <div class="field-error">Ingresa tu dirección.</div>
+        </div>
+
+        <div class="field-float" id="group-depto">
+          <input type="text" id="depto" name="depto" autocomplete="address-line2" placeholder=" ">
+          <label for="depto">Depto / block / torre (opcional)</label>
+        </div>
+
+        <p class="stage-subtitle">Opciones de Despacho</p>
+
+        <div class="delivery-options-box">
+          <label class="delivery-option-row">
+            <input type="radio" name="tipoEntregaOpcion" id="optDomicilio" value="domicilio" checked>
+            <span class="delivery-option-dot"></span>
+            <span class="delivery-option-body">
+              <span class="delivery-option-title">Despacho a domicilio por Blue Express</span>
+              <span class="delivery-option-desc">Envío por pagar, pagas el despacho al recibir</span>
+            </span>
+            <span class="delivery-option-price" id="precioDomicilio">-- aprox</span>
+          </label>
+
+          <label class="delivery-option-row">
+            <input type="radio" name="tipoEntregaOpcion" id="optSucursal" value="sucursal">
+            <span class="delivery-option-dot"></span>
+            <span class="delivery-option-body">
+              <span class="delivery-option-title">Retiro en Punto Blue Express más cercano</span>
+              <span class="delivery-option-desc">Envío por pagar, pagas el despacho al retirar</span>
+            </span>
+            <span class="delivery-option-price" id="precioSucursal">-- aprox</span>
+          </label>
+
+          <label class="delivery-option-row">
+            <input type="radio" name="tipoEntregaOpcion" id="optRetiro" value="retiro">
+            <span class="delivery-option-dot"></span>
+            <span class="delivery-option-body">
+              <span class="delivery-option-title">Retiro presencial Temuco</span>
+              <span class="delivery-option-desc">Temuco, Luis Durand 04257 (El Carmen)</span>
+            </span>
+            <span class="delivery-option-price">Gratis</span>
+          </label>
+        </div>
+
+        <h2 class="checkout-stage-title">Pago</h2>
+
+        <div class="payment-option">
+          <span class="payment-option-dot"></span>
+          <span class="payment-option-title">Transferencia</span>
+        </div>
+
+        <div class="payment-details" id="group-comprobante">
+          <div class="bank-info-box">
+            <p class="bank-info-title">Transferir a:</p>
+            <div class="bank-info-grid">
+              <span>Banco</span><strong>BancoEstado</strong>
+              <span>Tipo de cuenta</span><strong>Cuenta Vista (CuentaRUT)</strong>
+              <span>N.º de cuenta / RUT</span><strong>19.519.718-0</strong>
+              <span>Nombre</span><strong>David Fuentes</strong>
+            </div>
+          </div>
+
+          <div class="upload-box" id="uploadBox">
+            <input type="file" id="comprobante" name="comprobante" accept="image/*">
+            <label for="comprobante" id="uploadPlaceholder" class="upload-hint" style="display:block;cursor:pointer;">
+              <strong>Sube una captura o foto</strong><br>
+              del comprobante de tu transferencia
+            </label>
+            <div id="uploadPreview" class="upload-preview" style="display:none;">
+              <img id="uploadPreviewImg" src="" alt="">
+              <span class="upload-preview-name" id="uploadPreviewName"></span>
+              <button type="button" class="upload-remove" id="uploadRemove">Quitar</button>
+            </div>
+          </div>
+          <div class="field-error">Adjunta el comprobante de tu pago.</div>
+        </div>
+
+        <div class="order-summary">
+          <img id="orderSummaryImg" src="https://i.ibb.co/PsPkKDVs/album1.webp" alt="">
+          <div class="order-summary-text">
+            <strong>Total</strong>
+            <span id="orderQtyText">1 copia + envío por pagar</span>
+          </div>
+          <span class="order-summary-price" id="orderTotalText">$9.990</span>
+        </div>
+
+        <div class="checkout-progress" id="checkoutProgressRow" hidden>
+          <div class="checkout-progress-track">
+            <div class="checkout-progress-fill" id="checkoutProgressFill"></div>
+          </div>
+          <span class="checkout-progress-label" id="checkoutProgressLabel"></span>
+        </div>
+
+        <p class="checkout-error" id="checkoutError" hidden></p>
+
+        <button type="submit" class="submit-btn" id="submitBtn" disabled>
+          <span class="spinner"></span>
+          <span id="submitBtnText">Pagar ahora</span>
+        </button>
+        <p class="submit-hint" id="submitHint">Sube el comprobante de tu transferencia para poder pagar.</p>
+        <p class="form-note">
+          Al comprar aceptas que revisemos el comprobante antes de despachar tu pedido.<br>
+          Si tienes algún problema, escríbenos a: <a href="mailto:memoriamensajera@gmail.com">memoriamensajera@gmail.com</a>
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 3: CONFIRMACIÓN ============ -->
+  <section class="screen" id="screen-confirm">
+    <div class="confirm-wrap">
+      <div class="confirm-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 class="confirm-title">¡Pedido recibido!</h2>
+      <p class="confirm-text">Revisaremos tu comprobante y comenzaremos a preparar tu álbum.</p>
+      <p class="confirm-text">Te enviaremos la confirmación a <strong id="confirmEmail">tu@correo.com</strong>.</p>
+      <div class="confirm-order">N.º de pedido <strong id="confirmOrderId">#000000</strong></div>
+      <br>
+      <button class="confirm-back" id="confirmBack">Volver al inicio</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* =====================================================================
+   Wizard de armado del álbum (album-fotos.js original, con dos cambios:
+   - se quitó la detección de variante de Shopify (no aplica aquí)
+   - ya no sube nada a imgbb al hacer clic en "Comprar" del paso 3: solo
+     prepara la portada localmente y llama a window.onAlbumWizardComplete()
+     para pasar al checkout. La subida real (subirFotosPendientes) la
+     dispara el checkout recién al confirmar la compra.
+   ===================================================================== */
+(function () {
+  'use strict';
+
+  const CONCURRENCY = 3;
+  const MAX_RETRIES = 2;
+  // Lado máximo (px) de la copia que se mantiene en memoria PERMANENTEMENTE por cada
+  // foto (para poder editar: recortar/rotar/espejo/zoom en vivo, en los 40 tiles a la
+  // vez). 600px es de sobra para cualquier vista previa en pantalla y evita que
+  // Safari/iOS mate la pestaña por consumo de RAM con álbumes de 40 fotos.
+  const MAX_SOURCE_SIDE = 600;
+  // Lado máximo (px) del render en ALTA resolución que se genera SOLO al momento de
+  // comprar, una foto a la vez, releyendo el archivo original (no la copia liviana).
+  const MAX_EXPORT_SIDE = 2000;
+
+  function clamp01(value) {
+    return Math.min(1, Math.max(0, value));
+  }
+
+  class AlbumWizard {
+    constructor(root) {
+      this.root = root;
+      // Las imágenes se suben a través del Worker de Cloudflare, que guarda la
+      // key de imgbb como secreto (ya no está en el HTML) y la agrega al reenviar.
+      this.imgbbProxyUrl = root.dataset.imgbbProxyUrl;
+      this.numPhotos = parseInt(root.dataset.numPhotos, 10) || 40;
+      this.targetW = parseInt(root.dataset.targetW, 10) || 1200;
+      this.targetH = parseInt(root.dataset.targetH, 10) || 1800;
+      this.variantId = root.dataset.variantId;
+      this.fallbackUrl = root.dataset.fallbackUrl;
+      this.stampFrameSrc = root.dataset.stampFrameSrc;
+      this.albumSrc = root.dataset.albumSrc;
+      this.decorTopSrc = root.dataset.decorTopSrc;
+      this.decorSignatureSrc = root.dataset.decorSignatureSrc;
+      const expirationDays = parseInt(root.dataset.expirationDays, 10) || 14;
+      this.expirationSeconds = expirationDays * 24 * 60 * 60;
+
+      // photo: { id, file, source(canvas), autoRotate, userRotation, flip,
+      //          blob, blobUrl, status, url, retries }
+      // status: pending | cropping | ready | error | done
+      // Todo el trabajo de "pending" a "ready" ocurre en el navegador, sin red.
+      // El único momento en que se sube a imgbb es al presionar "Comprar" (paso 3).
+      this.photos = [];
+      this.coverIndex = 0;
+      this.stampEditOpen = false;
+      // Copias independientes de portada, una por foto original (clave = photo.id).
+      // Se crean recién cuando el usuario abre el editor de portada, o justo antes
+      // de comprar si nunca se editó. Nunca modifican la foto original.
+      this.coverOverrides = new Map();
+      // Foto recién eliminada (para el botón "Deshacer" del toast) y su timer de
+      // limpieza definitiva (revocar URLs) si no se deshace a tiempo.
+      this.pendingDiscard = null;
+      this.discardCleanupTimer = null;
+      this.toastTimer = null;
+      this.toastUndoHandler = null;
+      this.confettiCleanupTimer = null;
+
+      this.queue = [];
+      this.runningCrops = 0;
+
+      this.dotTimer = null;
+      this.dotFrame = 0;
+      this.selectedTileId = null;
+      this.tileEls = new Map();
+
+      this.cacheEls();
+      this.setStaticAssets();
+      this.bindEvents();
+      this.goToStep('1');
+    }
+
+    cacheEls() {
+      const q = (sel) => this.root.querySelector(sel);
+      this.fileInput = q('[data-file-input]');
+      this.uploadCardEl = q('.album-upload-card');
+      this.emptyStateEl = q('[data-empty-state]');
+      this.filledStateEl = q('[data-filled-state]');
+      this.counterEl = q('[data-counter]');
+      this.statusRowEl = q('[data-status-row]');
+      this.gridEl = q('[data-grid]');
+
+      this.stampZoneEl = q('[data-stamp-zone]');
+      this.stampPhotoEl = q('[data-stamp-photo]');
+      this.stampFrameBgEl = q('[data-stamp-frame-bg]');
+      this.ghostPrevEl = q('[data-ghost-prev]');
+      this.ghostPrevImgEl = q('[data-ghost-prev-img]');
+      this.ghostNextEl = q('[data-ghost-next]');
+      this.ghostNextImgEl = q('[data-ghost-next-img]');
+      this.prevBtn = q('[data-prev-photo]');
+      this.nextBtn = q('[data-next-photo]');
+
+      this.stampEditEl = q('[data-stamp-edit]');
+      this.stampCanvasEl = q('[data-stamp-canvas]');
+      this.stampMaskEl = this.stampPhotoEl ? this.stampPhotoEl.parentElement : null;
+      this.zoomInBtn = q('[data-zoom-in]');
+      this.zoomOutBtn = q('[data-zoom-out]');
+      this.zoomLabelEl = q('[data-zoom-label]');
+      this.coverRotateBtn = q('[data-cover-rotate]');
+      this.coverFlipBtn = q('[data-cover-flip]');
+      this.coverCloseBtn = q('[data-cover-close]');
+
+      this.finalCoverEl = q('[data-final-cover]');
+      this.decorTopEl = q('[data-decor-top]');
+      this.albumBgEl = q('[data-album-bg]');
+      this.decorSignatureEl = q('[data-decor-signature]');
+      this.buyBtn = q('[data-add-to-cart]');
+      this.cartErrorEl = q('[data-cart-error]');
+
+      this.toastEl = q('[data-toast]');
+      this.toastTextEl = q('[data-toast-text]');
+      this.toastUndoBtn = q('[data-toast-undo]');
+
+      this.uploadOverlayEl = q('[data-upload-overlay]');
+      this.uploadBoxEl = q('[data-upload-box]');
+      this.uploadBarEl = q('[data-upload-bar]');
+      this.uploadTextEl = q('[data-upload-text]');
+
+      this.confettiEl = q('[data-confetti]');
+    }
+
+    setStaticAssets() {
+      if (this.stampFrameBgEl) this.stampFrameBgEl.src = this.stampFrameSrc;
+      if (this.decorTopEl) this.decorTopEl.src = this.decorTopSrc;
+      if (this.albumBgEl) this.albumBgEl.src = this.albumSrc;
+      if (this.decorSignatureEl) this.decorSignatureEl.src = this.decorSignatureSrc;
+    }
+
+    // Toast simple reutilizable (aviso de límite de fotos / foto eliminada + deshacer).
+    showToast(message, { undo = false, onUndo = null, duration = 3000 } = {}) {
+      if (!this.toastEl) return;
+      clearTimeout(this.toastTimer);
+      if (this.toastTextEl) this.toastTextEl.textContent = message;
+      if (this.toastUndoBtn) this.toastUndoBtn.hidden = !undo;
+      this.toastUndoHandler = onUndo;
+      this.toastEl.hidden = false;
+      requestAnimationFrame(() => this.toastEl.classList.add('album-is-visible'));
+      this.toastTimer = setTimeout(() => this.hideToast(), duration);
+    }
+
+    hideToast() {
+      if (!this.toastEl) return;
+      clearTimeout(this.toastTimer);
+      this.toastEl.classList.remove('album-is-visible');
+      setTimeout(() => {
+        this.toastEl.hidden = true;
+      }, 200);
+    }
+
+    // Confeti simple (sin librerías externas): un puñado de piezas de colores que
+    // caen y giran con CSS, se limpian solas al terminar la animación.
+    launchConfetti() {
+      if (!this.confettiEl) return;
+      const colors = ['#3B62C4', '#AEE0F9', '#ffffff', '#242424', '#90AEE8'];
+      const count = 100;
+      const frag = document.createDocumentFragment();
+
+      // "Suelo" del confeti: a la altura del botón Comprar, no en el borde inferior
+      // absoluto del wizard. Se calcula relativo a la altura real del contenedor.
+      const containerRect = this.confettiEl.getBoundingClientRect();
+      const buyBtnRect = this.buyBtn ? this.buyBtn.getBoundingClientRect() : null;
+      const baseLandY =
+        buyBtnRect && containerRect.height
+          ? buyBtnRect.top - containerRect.top
+          : (containerRect.height || 600) * 0.82;
+
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'album-confetti-piece';
+        const left = Math.random() * 100;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const width = 6 + Math.random() * 6;
+        const height = width * 0.4;
+        const duration = 3 + Math.random() * 2;
+        const delay = Math.random() * 0.6;
+        const drift = (Math.random() - 0.5) * 180;
+        const rotateEnd = 360 + Math.random() * 720;
+        const landY = baseLandY + (Math.random() - 0.5) * 24;
+
+        piece.style.left = `${left}%`;
+        piece.style.background = color;
+        piece.style.width = `${width}px`;
+        piece.style.height = `${height}px`;
+        piece.style.animationDuration = `${duration}s`;
+        piece.style.animationDelay = `${delay}s`;
+        piece.style.setProperty('--drift', `${drift}px`);
+        piece.style.setProperty('--rotate-end', `${rotateEnd}deg`);
+        piece.style.setProperty('--land-y', `${landY}px`);
+        frag.appendChild(piece);
+      }
+
+      this.confettiEl.innerHTML = '';
+      this.confettiEl.appendChild(frag);
+
+      clearTimeout(this.confettiCleanupTimer);
+      this.confettiCleanupTimer = setTimeout(() => {
+        this.confettiEl.innerHTML = '';
+      }, 5800);
+    }
+
+    bindEvents() {
+      this.fileInput.addEventListener('change', (e) => this.handleFiles(e.target.files));
+
+      this.uploadCardEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        this.uploadCardEl.classList.add('album-is-dragover');
+      });
+      this.uploadCardEl.addEventListener('dragleave', (e) => {
+        // Evita parpadeo: solo quitar el resalte si realmente se sale de la
+        // tarjeta (no al pasar sobre un elemento hijo dentro de ella).
+        if (!this.uploadCardEl.contains(e.relatedTarget)) {
+          this.uploadCardEl.classList.remove('album-is-dragover');
+        }
+      });
+      this.uploadCardEl.addEventListener('drop', (e) => {
+        e.preventDefault();
+        this.uploadCardEl.classList.remove('album-is-dragover');
+        this.handleFiles(e.dataTransfer.files);
+      });
+
+      this.root.querySelectorAll('[data-go-step]').forEach((btn) => {
+        btn.addEventListener('click', () => this.goToStep(btn.dataset.goStep));
+      });
+
+      if (this.toastUndoBtn) {
+        this.toastUndoBtn.addEventListener('click', () => {
+          if (typeof this.toastUndoHandler === 'function') this.toastUndoHandler();
+        });
+      }
+
+      this.root.addEventListener('click', (e) => {
+        if (!e.target.closest('.album-tile')) {
+          this.selectedTileId = null;
+          this.tileEls.forEach((tile, id) => {
+            const photo = this.photos.find((p) => p.id === id);
+            if (photo) this.paintTile(tile, photo);
+          });
+        }
+      });
+
+      if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.goPrevPhoto());
+      if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.goNextPhoto());
+
+      let dragStartX = null;
+      if (this.stampZoneEl) {
+        this.stampZoneEl.addEventListener('pointerdown', (e) => {
+          // Mientras se está reencuadrando la portada, el swipe de navegación se desactiva.
+          if (this.stampEditOpen) return;
+          dragStartX = e.clientX;
+        });
+        this.stampZoneEl.addEventListener('pointerup', (e) => {
+          if (this.stampEditOpen || dragStartX === null) {
+            dragStartX = null;
+            return;
+          }
+          const delta = e.clientX - dragStartX;
+          if (Math.abs(delta) > 40) {
+            delta < 0 ? this.goNextPhoto() : this.goPrevPhoto();
+          }
+          dragStartX = null;
+        });
+      }
+
+      this.bindStampEditEvents();
+
+      this.buyBtn.addEventListener('click', () => this.addToCart());
+    }
+
+    // ---------- edición de la portada (paso 2) ----------
+    // La portada es una COPIA independiente de la foto elegida: se crea la primera
+    // vez que se abre el editor (o justo antes de comprar si nunca se editó) y a
+    // partir de ahí toda edición (rotar/espejo/zoom/encuadre) se aplica solo a esa
+    // copia, sin tocar la foto original que aparece en la grilla del paso 1.
+    //
+    // La vista previa en vivo se dibuja en un <canvas> con drawImage() usando
+    // exactamente la misma ventana de recorte que el archivo final (computeCropWindow).
+    // drawImage() no tiene ninguna ambigüedad de interpretación (a diferencia de
+    // combinar CSS transform + object-fit), así que lo que se ve siempre coincide
+    // con lo que se sube.
+
+    // Devuelve (creando si hace falta) la copia de portada para la foto original dada,
+    // ya renderizada (con blob/blobUrl listos), sin modificar la foto original.
+    async ensureCoverOverride(original) {
+      let cover = this.coverOverrides.get(original.id);
+      if (!cover) {
+        cover = {
+          id: 'cover-' + original.id,
+          file: original.file,
+          source: original.source,
+          autoRotate: original.autoRotate,
+          userRotation: original.userRotation,
+          flip: original.flip,
+          offsetX: original.offsetX,
+          offsetY: original.offsetY,
+          zoom: original.zoom,
+          rotatedW: 0,
+          rotatedH: 0,
+          rotatedCanvas: null,
+          isDraggable: false,
+          blob: null,
+          blobUrl: null,
+          previewUrl: null,
+          status: 'pending',
+          url: null,
+        };
+        this.coverOverrides.set(original.id, cover);
+      }
+      if (!cover.blobUrl) {
+        await this.bakeCoverPhoto(cover);
+      }
+      return cover;
+    }
+
+    // Genera el recorte final de la copia de portada, tal cual están sus valores
+    // actuales (sin resetear offset/zoom, a diferencia de rotar/reflejar). Guarda
+    // también el canvas ya rotado/reflejado (rotatedCanvas) para poder redibujar
+    // la vista previa en vivo sin repetir el trabajo de rotación en cada movimiento.
+    async bakeCoverPhoto(cover) {
+      const { canvas: rotatedCanvas, width, height } = this.buildRotatedCanvas(cover);
+      cover.rotatedCanvas = rotatedCanvas;
+      cover.rotatedW = width;
+      cover.rotatedH = height;
+      cover.isDraggable = this.computeIsDraggable(width, height, cover.zoom);
+
+      const blob = await this.cropCanvasToBlob(rotatedCanvas, width, height, cover.offsetX, cover.offsetY, cover.zoom);
+      if (cover.blobUrl) URL.revokeObjectURL(cover.blobUrl);
+      cover.blob = blob;
+      cover.blobUrl = URL.createObjectURL(blob);
+      cover.status = 'ready';
+      cover.url = null;
+    }
+
+    // Recalcula solo el recorte final (offset/zoom ya cambiaron), reutilizando el
+    // rotatedCanvas ya guardado en vez de reconstruirlo desde cero.
+    async applyCoverCropOffset(cover) {
+      if (!cover.rotatedCanvas) {
+        await this.bakeCoverPhoto(cover);
+        return;
+      }
+      const blob = await this.cropCanvasToBlob(
+        cover.rotatedCanvas,
+        cover.rotatedW,
+        cover.rotatedH,
+        cover.offsetX,
+        cover.offsetY,
+        cover.zoom
+      );
+      if (cover.blobUrl) URL.revokeObjectURL(cover.blobUrl);
+      cover.blob = blob;
+      cover.blobUrl = URL.createObjectURL(blob);
+      cover.url = null;
+    }
+
+    getCoverOverride() {
+      const original = this.photos[this.coverIndex];
+      return original ? this.coverOverrides.get(original.id) : null;
+    }
+
+    // Dibuja la vista previa en vivo: la misma ventana de recorte (computeCropWindow)
+    // que usa el archivo final, pintada con drawImage() sobre un canvas del tamaño
+    // real del marco. El marco decorativo no tiene EXACTAMENTE la misma proporción
+    // que el recorte final, así que además recortamos (sin estirar) la ventana para
+    // que calce con la proporción real del marco, igual que hacía object-fit:cover.
+    drawStampPreview(cover) {
+      if (!this.stampCanvasEl || !cover || !cover.rotatedCanvas) return;
+      const rect = this.stampCanvasEl.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const pixelW = Math.max(1, Math.round(rect.width * dpr));
+      const pixelH = Math.max(1, Math.round(rect.height * dpr));
+      if (this.stampCanvasEl.width !== pixelW) this.stampCanvasEl.width = pixelW;
+      if (this.stampCanvasEl.height !== pixelH) this.stampCanvasEl.height = pixelH;
+
+      let { sx, sy, sw, sh } = this.computeCropWindow(cover.rotatedW, cover.rotatedH, cover.offsetX, cover.offsetY, cover.zoom);
+
+      const destAspect = pixelW / pixelH;
+      const srcAspect = sw / sh;
+      if (destAspect > srcAspect) {
+        const newSh = sw / destAspect;
+        sy += (sh - newSh) / 2;
+        sh = newSh;
+      } else if (destAspect < srcAspect) {
+        const newSw = sh * destAspect;
+        sx += (sw - newSw) / 2;
+        sw = newSw;
+      }
+
+      const ctx = this.stampCanvasEl.getContext('2d');
+      ctx.clearRect(0, 0, pixelW, pixelH);
+      ctx.drawImage(cover.rotatedCanvas, sx, sy, sw, sh, 0, 0, pixelW, pixelH);
+    }
+
+    bindStampEditEvents() {
+      if (!this.stampPhotoEl || !this.stampMaskEl) return;
+
+      this.stampPhotoEl.addEventListener('dragstart', (e) => e.preventDefault());
+
+      if (this.zoomOutBtn) this.zoomOutBtn.addEventListener('click', () => this.changeCoverZoom(-0.1));
+      if (this.zoomInBtn) this.zoomInBtn.addEventListener('click', () => this.changeCoverZoom(0.1));
+      if (this.coverRotateBtn) this.coverRotateBtn.addEventListener('click', () => this.rotateCoverPhoto());
+      if (this.coverFlipBtn) this.coverFlipBtn.addEventListener('click', () => this.flipCoverPhoto());
+      if (this.coverCloseBtn) this.coverCloseBtn.addEventListener('click', () => this.closeStampEdit());
+
+      let dragState = null;
+      let wasDragging = false;
+
+      // Los gestos de arrastre se escuchan en la máscara (el contenedor fijo), no en
+      // la imagen ni el canvas por separado, para no duplicar listeners entre ambos.
+      this.stampMaskEl.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.album-icon-btn, .album-zoom-row')) return;
+        const cover = this.getCoverOverride();
+        if (!this.stampEditOpen || !cover || !cover.isDraggable || !cover.source) return;
+        const rect = this.stampMaskEl.getBoundingClientRect();
+        dragState = {
+          startX: e.clientX,
+          startY: e.clientY,
+          startOffsetX: cover.offsetX,
+          startOffsetY: cover.offsetY,
+          rectW: rect.width,
+          rectH: rect.height,
+        };
+        wasDragging = false;
+        this.stampMaskEl.setPointerCapture(e.pointerId);
+      });
+
+      this.stampMaskEl.addEventListener('pointermove', (e) => {
+        if (!dragState) return;
+        const cover = this.getCoverOverride();
+        if (!cover) return;
+        const dx = e.clientX - dragState.startX;
+        const dy = e.clientY - dragState.startY;
+        if (!wasDragging && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+          wasDragging = true;
+          this.stampMaskEl.style.cursor = 'grabbing';
+        }
+        if (!wasDragging) return;
+
+        // Ventana de recorte real (misma matemática que el recorte final): a más
+        // zoom, sw/sh se achican y por lo tanto SIEMPRE queda sobrante en ambos
+        // ejes para desplazar, sin importar cuál eje era el "ajustado" a 100%.
+        const { sw, sh } = this.cropWindowSize(cover.rotatedW, cover.rotatedH, cover.zoom);
+        const scale = dragState.rectW / sw;
+        const overflowX = scale * (cover.rotatedW - sw);
+        const overflowY = scale * (cover.rotatedH - sh);
+
+        let nextX = dragState.startOffsetX;
+        let nextY = dragState.startOffsetY;
+        if (overflowX > 1) nextX = clamp01(dragState.startOffsetX - dx / overflowX);
+        if (overflowY > 1) nextY = clamp01(dragState.startOffsetY - dy / overflowY);
+
+        cover.offsetX = nextX;
+        cover.offsetY = nextY;
+        this.drawStampPreview(cover);
+      });
+
+      const endDrag = () => {
+        if (!dragState) return;
+        dragState = null;
+        const cover = this.getCoverOverride();
+        if (cover) this.stampMaskEl.style.cursor = cover.isDraggable ? 'grab' : 'default';
+        if (wasDragging && cover) {
+          this.applyCoverCropOffset(cover).catch((err) => console.error('Error al reencuadrar la portada:', err && err.message ? err.message : err));
+        }
+      };
+      this.stampMaskEl.addEventListener('pointerup', endDrag);
+      this.stampMaskEl.addEventListener('pointercancel', endDrag);
+
+      this.stampMaskEl.addEventListener('click', (e) => {
+        if (e.target.closest('.album-icon-btn, .album-zoom-row')) return;
+        if (wasDragging) {
+          wasDragging = false;
+          return;
+        }
+        const original = this.photos[this.coverIndex];
+        if (!original || (original.status !== 'ready' && original.status !== 'done')) return;
+        if (this.stampEditOpen) {
+          this.closeStampEdit();
+        } else {
+          this.openStampEdit().catch((err) => console.error('Error al abrir la edición de portada:', err && err.message ? err.message : err));
+        }
+      });
+    }
+
+    async openStampEdit() {
+      const original = this.photos[this.coverIndex];
+      if (!original) return;
+      const cover = await this.ensureCoverOverride(original);
+      this.stampEditOpen = true;
+      if (this.stampMaskEl) this.stampMaskEl.classList.add('album-is-editing');
+      this.stampMaskEl.style.cursor = cover.isDraggable ? 'grab' : 'default';
+      this.drawStampPreview(cover);
+      this.updateZoomUI(cover);
+      if (this.stampEditEl) this.stampEditEl.classList.add('album-is-visible');
+    }
+
+    closeStampEdit() {
+      this.stampEditOpen = false;
+      const original = this.photos[this.coverIndex];
+      if (original && this.stampPhotoEl) {
+        const cover = this.coverOverrides.get(original.id);
+        this.stampPhotoEl.src = (cover ? cover.blobUrl : original.blobUrl) || '';
+      }
+      if (this.stampMaskEl) {
+        this.stampMaskEl.classList.remove('album-is-editing');
+        this.stampMaskEl.style.cursor = '';
+      }
+      if (this.stampEditEl) this.stampEditEl.classList.remove('album-is-visible');
+    }
+
+    updateZoomUI(cover) {
+      if (this.zoomLabelEl) this.zoomLabelEl.textContent = `${Math.round(cover.zoom * 100)}%`;
+      if (this.zoomOutBtn) this.zoomOutBtn.disabled = cover.zoom <= 1;
+      if (this.zoomInBtn) this.zoomInBtn.disabled = cover.zoom >= 2;
+    }
+
+    async changeCoverZoom(delta) {
+      const cover = this.getCoverOverride();
+      if (!cover || !this.stampEditOpen) return;
+      const nextZoom = Math.min(2, Math.max(1, Math.round((cover.zoom + delta) * 100) / 100));
+      if (nextZoom === cover.zoom) return;
+      cover.zoom = nextZoom;
+      cover.isDraggable = this.computeIsDraggable(cover.rotatedW, cover.rotatedH, cover.zoom);
+      this.drawStampPreview(cover);
+      this.updateZoomUI(cover);
+      if (this.stampMaskEl) this.stampMaskEl.style.cursor = cover.isDraggable ? 'grab' : 'default';
+      try {
+        await this.applyCoverCropOffset(cover);
+      } catch (err) {
+        console.error('Error al hacer zoom a la portada:', err && err.message ? err.message : err);
+      }
+    }
+
+    async rotateCoverPhoto() {
+      const cover = this.getCoverOverride();
+      if (!cover || !cover.source) return;
+      cover.userRotation = ((cover.userRotation || 0) + 90) % 360;
+      cover.offsetX = 0.5;
+      cover.offsetY = 0.5;
+      cover.zoom = 1;
+      try {
+        await this.bakeCoverPhoto(cover);
+        this.drawStampPreview(cover);
+        this.updateZoomUI(cover);
+        if (this.stampMaskEl) this.stampMaskEl.style.cursor = cover.isDraggable ? 'grab' : 'default';
+      } catch (err) {
+        console.error('Error al rotar la portada:', err && err.message ? err.message : err);
+      }
+    }
+
+    async flipCoverPhoto() {
+      const cover = this.getCoverOverride();
+      if (!cover || !cover.source) return;
+      cover.flip = !cover.flip;
+      cover.offsetX = 0.5;
+      cover.offsetY = 0.5;
+      cover.zoom = 1;
+      try {
+        await this.bakeCoverPhoto(cover);
+        this.drawStampPreview(cover);
+        this.updateZoomUI(cover);
+        if (this.stampMaskEl) this.stampMaskEl.style.cursor = cover.isDraggable ? 'grab' : 'default';
+      } catch (err) {
+        console.error('Error al reflejar la portada:', err && err.message ? err.message : err);
+      }
+    }
+
+    // ---------- selección y procesamiento local (paso 1) ----------
+
+    handleFiles(fileList) {
+      const remaining = this.numPhotos - this.photos.length;
+      const incoming = Array.from(fileList);
+
+      // El atributo "accept" del input es solo una sugerencia visual del selector
+      // del sistema operativo: no bloquea arrastrar y soltar ni "todos los archivos".
+      // Esta es la validación real: solo imágenes, explícitamente sin GIF/video/PDF/documentos.
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+      const validImages = incoming.filter((file) => ALLOWED_TYPES.includes(file.type));
+      const rejectedCount = incoming.length - validImages.length;
+
+      const files = validImages.slice(0, remaining);
+      const overLimitCount = validImages.length - files.length;
+
+      if (rejectedCount > 0 && overLimitCount > 0) {
+        this.showToast('Algunos archivos no son imágenes válidas y otros superan el límite de fotos.');
+      } else if (rejectedCount > 0) {
+        this.showToast('Solo se permiten imágenes (JPG, PNG o WEBP).');
+      } else if (overLimitCount > 0) {
+        this.showToast(`Solo puedes subir ${this.numPhotos} fotos en total.`);
+      }
+
+      if (files.length === 0) return;
+
+      this.emptyStateEl.style.display = 'none';
+      this.filledStateEl.style.display = 'flex';
+      this.uploadCardEl.classList.remove('album-is-empty');
+
+      files.forEach((file) => {
+        const photo = {
+          id: 'p' + Math.random().toString(36).slice(2),
+          file,
+          source: null,
+          autoRotate: false,
+          userRotation: 0,
+          flip: false,
+          // Posición del recorte dentro de la foto rotada (0-1, 0.5 = centrado).
+          // Solo tiene efecto visible cuando isDraggable es true.
+          offsetX: 0.5,
+          offsetY: 0.5,
+          // Zoom del recorte "cover" (1 = 100%, hasta 2 = 200%). Editable en el paso 2.
+          zoom: 1,
+          rotatedW: 0,
+          rotatedH: 0,
+          isDraggable: false,
+          blob: null,
+          blobUrl: null,
+          // Vista previa sin recortar (foto rotada completa) usada en el grid para
+          // poder arrastrar y reencuadrar con object-position, sin recalcular canvas.
+          previewUrl: null,
+          status: 'pending', // pending | cropping | ready | error | done
+          url: null,
+          retries: 0,
+          _wasDragging: false,
+        };
+        this.photos.push(photo);
+        this.queue.push(photo.id);
+      });
+
+      this.renderGrid();
+      this.updateStatus();
+      this.cropPump();
+    }
+
+    cropPump() {
+      while (this.runningCrops < CONCURRENCY && this.queue.length > 0) {
+        const id = this.queue.shift();
+        const photo = this.photos.find((p) => p.id === id);
+        if (photo) this.processPhoto(photo);
+      }
+    }
+
+    // Lee el archivo y prepara una copia en un canvas, reducida a maxSide como máximo.
+    // Se reutiliza tanto para la copia liviana que vive en memoria todo el tiempo
+    // (maxSide = MAX_SOURCE_SIDE) como para el render en alta resolución que se genera
+    // al momento de comprar y se descarta enseguida (maxSide = MAX_EXPORT_SIDE).
+    loadSource(file, maxSide) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const naturalWidth = img.width;
+            const naturalHeight = img.height;
+            const scale = Math.min(1, maxSide / Math.max(naturalWidth, naturalHeight));
+            const width = Math.max(1, Math.round(naturalWidth * scale));
+            const height = Math.max(1, Math.round(naturalHeight * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            // Fondo blanco antes de dibujar: si el archivo es un PNG con transparencia,
+            // sin esto el área transparente saldría negra al exportar como JPEG.
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve({ canvas, width, height, naturalWidth, naturalHeight });
+          };
+          img.onerror = () => reject(new Error('Archivo no es una imagen válida'));
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Vuelve a leer el archivo ORIGINAL en alta resolución. Se usa solo al comprar,
+    // una foto a la vez, y el canvas se libera enseguida (ver renderFinalBlob) — así
+    // nunca hay más de un canvas pesado en memoria a la vez, evitando que Safari/iOS
+    // mate la pestaña al procesar álbumes de 40 fotos.
+    loadHighResSource(file) {
+      return this.loadSource(file, MAX_EXPORT_SIDE);
+    }
+
+    // Lee el archivo, detecta orientación y genera el primer recorte. Todo local, sin red.
+    async processPhoto(photo) {
+      this.runningCrops++;
+      try {
+        photo.status = 'cropping';
+        this.updateThumb(photo);
+
+        const src = await this.loadSource(photo.file, MAX_SOURCE_SIDE);
+        photo.source = src.canvas;
+
+        // Si la foto viene horizontal pero el recorte final es vertical (o viceversa),
+        // la rotamos automáticamente 90° para aprovechar el encuadre óptimo.
+        const sourceIsLandscape = src.naturalWidth > src.naturalHeight;
+        const targetIsLandscape = this.targetW > this.targetH;
+        photo.autoRotate = src.naturalWidth !== src.naturalHeight && sourceIsLandscape !== targetIsLandscape;
+
+        await this.applyEdit(photo);
+      } catch (err) {
+        console.error('Error procesando foto:', err && err.message ? err.message : err);
+        photo.retries++;
+        photo.status = photo.retries <= MAX_RETRIES ? 'pending' : 'error';
+        this.updateThumb(photo);
+        this.updateStatus();
+      } finally {
+        this.runningCrops--;
+        if (photo.status === 'pending') this.queue.push(photo.id);
+        this.cropPump();
+      }
+    }
+
+    // Dibuja el source rotado/reflejado (sin recortar todavía) en un canvas nuevo.
+    // Es barato de recalcular bajo demanda, así que no se guarda en memoria permanentemente.
+    // sourceOverride permite usar una fuente distinta a photo.source (por ejemplo, la
+    // copia en alta resolución que se genera solo al momento de comprar).
+    buildRotatedCanvas(photo, sourceOverride) {
+      const source = sourceOverride || photo.source;
+      const totalRotation = ((photo.autoRotate ? 90 : 0) + (photo.userRotation || 0)) % 360;
+      const swap = totalRotation % 180 !== 0;
+      const width = swap ? source.height : source.width;
+      const height = swap ? source.width : source.height;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      // Fondo blanco antes de dibujar (mismo motivo: evitar negro en PNG transparentes).
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+      ctx.save();
+      ctx.translate(width / 2, height / 2);
+      ctx.rotate((totalRotation * Math.PI) / 180);
+      if (photo.flip) ctx.scale(-1, 1);
+      ctx.drawImage(source, -source.width / 2, -source.height / 2);
+      ctx.restore();
+
+      return { canvas, width, height };
+    }
+
+    // Recorta "cover" el canvas rotado al tamaño objetivo, usando offsetX/offsetY
+    // para decidir qué parte de la foto queda dentro del recorte, y zoom (1 = 100%,
+    // hasta 2 = 200%) para acercar la ventana de recorte más allá del "cover" mínimo.
+    cropCanvasToBlob(canvas, width, height, offsetX, offsetY, zoom) {
+      return new Promise((resolve, reject) => {
+        const out = document.createElement('canvas');
+        out.width = this.targetW;
+        out.height = this.targetH;
+        const ctx = out.getContext('2d');
+        // Tercera capa de seguridad contra fondos negros en PNG transparentes.
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, this.targetW, this.targetH);
+
+        const { sx, sy, sw, sh } = this.computeCropWindow(width, height, offsetX, offsetY, zoom);
+        ctx.drawImage(canvas, sx, sy, sw, sh, 0, 0, this.targetW, this.targetH);
+        out.toBlob(
+          (blob) => (blob ? resolve(blob) : reject(new Error('No se pudo generar la imagen'))),
+          'image/jpeg',
+          0.9
+        );
+      });
+    }
+
+    // Tamaño (en px del canvas fuente) de la ventana de recorte "cover" mínima
+    // (zoom = 100%) que llena exactamente el recorte objetivo sin dejar bordes.
+    coverCropSize(width, height) {
+      const srcRatio = width / height;
+      const targetRatio = this.targetW / this.targetH;
+      if (srcRatio > targetRatio) {
+        const sh = height;
+        return { sw: sh * targetRatio, sh };
+      }
+      const sw = width;
+      return { sw, sh: sw / targetRatio };
+    }
+
+    // Tamaño de la ventana de recorte considerando el zoom (a más zoom, ventana
+    // más chica = se ve más "acercado"). No depende del offset (posición).
+    cropWindowSize(width, height, zoom) {
+      const { sw: baseSw, sh: baseSh } = this.coverCropSize(width, height);
+      const z = Math.max(1, zoom || 1);
+      return { sw: baseSw / z, sh: baseSh / z };
+    }
+
+    // Ventana de recorte completa (posición + tamaño) dentro del canvas fuente.
+    // Única fuente de verdad: la usan tanto el recorte final (canvas) como la
+    // vista previa en pantalla del paso 2, así ambos son siempre coherentes.
+    computeCropWindow(width, height, offsetX, offsetY, zoom) {
+      const { sw, sh } = this.cropWindowSize(width, height, zoom);
+      const sx = clamp01(offsetX) * (width - sw);
+      const sy = clamp01(offsetY) * (height - sh);
+      return { sx, sy, sw, sh };
+    }
+
+    // Hay algo para arrastrar cuando la ventana de recorte (considerando el zoom)
+    // es más chica que la foto rotada en algún eje.
+    computeIsDraggable(width, height, zoom) {
+      const { sw, sh } = this.cropWindowSize(width, height, zoom);
+      return width - sw > 1 || height - sh > 1;
+    }
+
+    canvasToBlob(canvas, quality) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(
+          (blob) => (blob ? resolve(blob) : reject(new Error('No se pudo generar la vista previa'))),
+          'image/jpeg',
+          quality
+        );
+      });
+    }
+
+    // Se llama la primera vez y cada vez que el usuario rota/refleja la foto: recalcula
+    // la vista previa (foto rotada completa, para poder arrastrar) y el recorte final.
+    // El recorte vuelve a quedar centrado y sin zoom porque al rotar cambian las
+    // proporciones y un offset/zoom previo ya no tendría sentido.
+    async applyEdit(photo) {
+      const { canvas: rotatedCanvas, width, height } = this.buildRotatedCanvas(photo);
+      photo.rotatedW = width;
+      photo.rotatedH = height;
+
+      photo.offsetX = 0.5;
+      photo.offsetY = 0.5;
+      photo.zoom = 1;
+      photo.isDraggable = this.computeIsDraggable(width, height, photo.zoom);
+
+      const previewBlob = await this.canvasToBlob(rotatedCanvas, 0.85);
+      if (photo.previewUrl) URL.revokeObjectURL(photo.previewUrl);
+      photo.previewUrl = URL.createObjectURL(previewBlob);
+
+      const blob = await this.cropCanvasToBlob(rotatedCanvas, width, height, photo.offsetX, photo.offsetY, photo.zoom);
+      if (photo.blobUrl) URL.revokeObjectURL(photo.blobUrl);
+      photo.blob = blob;
+      photo.blobUrl = URL.createObjectURL(blob);
+
+      photo.status = 'ready';
+      // Si ya se había subido antes (ej. un intento de compra fallido a mitad de camino),
+      // esa URL quedó obsoleta: se volverá a subir en el próximo intento de compra.
+      photo.url = null;
+      this.updateThumb(photo);
+      this.updateStatus();
+    }
+
+    // Se llama al soltar el arrastre o cambiar el zoom: solo recalcula el recorte
+    // final (la vista previa ya se venía mostrando en vivo vía CSS).
+    async applyCropOffset(photo) {
+      const { canvas: rotatedCanvas, width, height } = this.buildRotatedCanvas(photo);
+      photo.isDraggable = this.computeIsDraggable(width, height, photo.zoom);
+      const blob = await this.cropCanvasToBlob(rotatedCanvas, width, height, photo.offsetX, photo.offsetY, photo.zoom);
+      if (photo.blobUrl) URL.revokeObjectURL(photo.blobUrl);
+      photo.blob = blob;
+      photo.blobUrl = URL.createObjectURL(blob);
+      photo.url = null;
+    }
+
+    // ---------- render paso 1 ----------
+
+    renderGrid() {
+      this.gridEl.innerHTML = '';
+      this.tileEls.clear();
+
+      this.photos.forEach((photo) => {
+        const tile = this.buildTile(photo);
+        this.tileEls.set(photo.id, tile);
+        this.gridEl.appendChild(tile);
+      });
+
+      this.renderAddTile();
+    }
+
+    renderAddTile() {
+      const existing = this.gridEl.querySelector('.album-add-tile');
+      if (existing) existing.remove();
+      if (this.photos.length < this.numPhotos) {
+        const addTile = document.createElement('label');
+        addTile.className = 'album-tile album-add-tile';
+        addTile.innerHTML = '+<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple style="display:none">';
+        addTile.querySelector('input').addEventListener('change', (e) => this.handleFiles(e.target.files));
+        this.gridEl.appendChild(addTile);
+      }
+    }
+
+    buildTile(photo) {
+      const tile = document.createElement('div');
+      tile.dataset.photoId = photo.id;
+      this.paintTile(tile, photo);
+
+      // Respaldo: algunos navegadores igual disparan el drag nativo de imagen/texto.
+      tile.addEventListener('dragstart', (e) => e.preventDefault());
+
+      // ---- arrastrar para reencuadrar (solo si la foto ya está seleccionada
+      // y el recorte "cover" realmente recorta algo de la imagen) ----
+      let dragState = null;
+
+      tile.addEventListener('pointerdown', (e) => {
+        if (this.selectedTileId !== photo.id) return;
+        if (!photo.isDraggable || !photo.source) return;
+        if (e.target.closest('.album-icon-btn')) return;
+        const img = tile.querySelector('img');
+        if (!img) return;
+        const rect = tile.getBoundingClientRect();
+        dragState = {
+          startX: e.clientX,
+          startY: e.clientY,
+          startOffsetX: photo.offsetX,
+          startOffsetY: photo.offsetY,
+          rectW: rect.width,
+          rectH: rect.height,
+        };
+        photo._wasDragging = false;
+        tile.setPointerCapture(e.pointerId);
+      });
+
+      tile.addEventListener('pointermove', (e) => {
+        if (!dragState) return;
+        const dx = e.clientX - dragState.startX;
+        const dy = e.clientY - dragState.startY;
+        if (!photo._wasDragging && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+          photo._wasDragging = true;
+          tile.classList.add('album-is-dragging');
+        }
+        if (!photo._wasDragging) return;
+
+        const scale = Math.max(dragState.rectW / photo.rotatedW, dragState.rectH / photo.rotatedH);
+        const overflowX = photo.rotatedW * scale - dragState.rectW;
+        const overflowY = photo.rotatedH * scale - dragState.rectH;
+
+        let nextX = dragState.startOffsetX;
+        let nextY = dragState.startOffsetY;
+        if (overflowX > 1) nextX = clamp01(dragState.startOffsetX - dx / overflowX);
+        if (overflowY > 1) nextY = clamp01(dragState.startOffsetY - dy / overflowY);
+
+        photo.offsetX = nextX;
+        photo.offsetY = nextY;
+
+        const img = tile.querySelector('img');
+        if (img) img.style.objectPosition = `${nextX * 100}% ${nextY * 100}%`;
+      });
+
+      const endDrag = () => {
+        if (!dragState) return;
+        dragState = null;
+        tile.classList.remove('album-is-dragging');
+        if (photo._wasDragging) {
+          this.applyCropOffset(photo).catch((err) => console.error('Error al reencuadrar la foto:', err && err.message ? err.message : err));
+        }
+      };
+      tile.addEventListener('pointerup', endDrag);
+      tile.addEventListener('pointercancel', endDrag);
+
+      tile.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        if (e.target.closest('[data-discard]')) {
+          this.discardPhoto(photo, tile);
+          return;
+        }
+        if (e.target.closest('[data-retry]')) {
+          photo.status = 'pending';
+          photo.retries = 0;
+          this.queue.push(photo.id);
+          this.paintTile(tile, photo);
+          this.cropPump();
+          return;
+        }
+        if (e.target.closest('[data-rotate]')) {
+          if (!photo.source) return;
+          photo.userRotation = ((photo.userRotation || 0) + 90) % 360;
+          this.applyEdit(photo).catch((err) => console.error('Error al rotar la foto:', err && err.message ? err.message : err));
+          return;
+        }
+        if (e.target.closest('[data-flip]')) {
+          if (!photo.source) return;
+          photo.flip = !photo.flip;
+          this.applyEdit(photo).catch((err) => console.error('Error al reflejar la foto:', err && err.message ? err.message : err));
+          return;
+        }
+
+        // Si el click viene justo después de arrastrar, no alternar la selección.
+        if (photo._wasDragging) {
+          photo._wasDragging = false;
+          return;
+        }
+
+        const previousId = this.selectedTileId;
+        this.selectedTileId = this.selectedTileId === photo.id ? null : photo.id;
+
+        // Apaga el overlay/opacidad de la foto que estaba seleccionada antes,
+        // para que nunca haya dos fotos mostrando sus opciones a la vez.
+        if (previousId && previousId !== photo.id) {
+          const prevTile = this.tileEls.get(previousId);
+          const prevPhoto = this.photos.find((p) => p.id === previousId);
+          if (prevTile && prevPhoto) this.paintTile(prevTile, prevPhoto);
+        }
+
+        this.paintTile(tile, photo);
+      });
+
+      return tile;
+    }
+
+    discardPhoto(photo, tile) {
+      const index = this.photos.indexOf(photo);
+      this.photos = this.photos.filter((p) => p.id !== photo.id);
+      this.queue = this.queue.filter((id) => id !== photo.id);
+      this.selectedTileId = null;
+      tile.remove();
+      this.tileEls.delete(photo.id);
+      this.renderAddTile();
+      this.updateStatus();
+
+      // No se revocan las URLs todavía: se guardan un momento por si el usuario
+      // presiona "Deshacer". Si había otra eliminación pendiente sin deshacer,
+      // se finaliza ahora (solo se puede deshacer la última eliminación).
+      if (this.pendingDiscard) this.finalizeDiscard(this.pendingDiscard.photo);
+      this.pendingDiscard = { photo, index };
+
+      clearTimeout(this.discardCleanupTimer);
+      this.discardCleanupTimer = setTimeout(() => this.finalizeDiscard(photo), 4000);
+
+      this.showToast('Foto eliminada', {
+        undo: true,
+        duration: 4000,
+        onUndo: () => this.undoDiscard(),
+      });
+    }
+
+    undoDiscard() {
+      if (!this.pendingDiscard) return;
+      clearTimeout(this.discardCleanupTimer);
+      const { photo, index } = this.pendingDiscard;
+      this.pendingDiscard = null;
+
+      const insertAt = Math.min(index, this.photos.length);
+      this.photos.splice(insertAt, 0, photo);
+      if (photo.status === 'pending') {
+        this.queue.push(photo.id);
+        this.cropPump();
+      }
+      this.renderGrid();
+      this.updateStatus();
+      this.hideToast();
+    }
+
+    // Revoca definitivamente las URLs de una foto eliminada (ya pasó la ventana
+    // para deshacer, o se eliminó otra foto antes de que se cumpliera).
+    finalizeDiscard(photo) {
+      if (this.pendingDiscard && this.pendingDiscard.photo === photo) {
+        this.pendingDiscard = null;
+      }
+      if (photo.blobUrl) URL.revokeObjectURL(photo.blobUrl);
+      if (photo.previewUrl) URL.revokeObjectURL(photo.previewUrl);
+      const cachedCover = this.coverOverrides.get(photo.id);
+      if (cachedCover) {
+        if (cachedCover.blobUrl) URL.revokeObjectURL(cachedCover.blobUrl);
+        if (cachedCover.previewUrl) URL.revokeObjectURL(cachedCover.previewUrl);
+        this.coverOverrides.delete(photo.id);
+      }
+    }
+
+    paintTile(tile, photo) {
+      const inProgress = photo.status === 'cropping';
+      const isSelected = photo.id === this.selectedTileId;
+
+      tile.className =
+        'album-tile' +
+        (inProgress ? ' album-is-uploading' : '') +
+        (isSelected ? ' album-is-selected' : '') +
+        (photo.isDraggable && !inProgress ? ' album-is-draggable' : '');
+
+      let badge = '<span class="album-check">✓</span>';
+      if (photo.status === 'cropping') {
+        badge = '<span class="album-badge">Procesando</span>';
+      } else if (photo.status === 'error') {
+        badge = '<span class="album-badge album-is-error" data-retry>Reintentar</span>';
+      }
+
+      const objectPosition = `${(photo.offsetX ?? 0.5) * 100}% ${(photo.offsetY ?? 0.5) * 100}%`;
+
+      tile.innerHTML = `
+        <img src="${photo.previewUrl || photo.blobUrl || ''}" style="object-position:${objectPosition};" draggable="false">
+        ${badge}
+        <div class="album-overlay">
+          <div class="album-tile-actions">
+            <button type="button" class="album-icon-btn" data-rotate title="Rotar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            </button>
+            <button type="button" class="album-icon-btn" data-flip title="Espejo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"></path><path d="M16 8l4 4-4 4"></path><path d="M8 8l-4 4 4 4"></path></svg>
+            </button>
+            <button type="button" class="album-icon-btn album-icon-btn-danger" data-discard title="Eliminar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    updateThumb(photo) {
+      const tile = this.tileEls.get(photo.id);
+      if (tile) this.paintTile(tile, photo);
+    }
+
+    updateStatus() {
+      const ready = this.photos.filter((p) => p.status === 'ready' || p.status === 'done').length;
+      const processing = this.photos.filter((p) => p.status === 'cropping').length;
+
+      this.counterEl.textContent = `${ready}/${this.numPhotos}`;
+      this.counterEl.style.opacity = ready >= this.numPhotos ? 1 : 0.3 + (ready / (this.numPhotos - 1)) * 0.3;
+
+      const nextBtn = this.root.querySelector('.album-panel[data-panel="1"] [data-go-step="2"]');
+      if (nextBtn) nextBtn.disabled = ready < this.numPhotos;
+
+      clearInterval(this.dotTimer);
+      if (processing > 0) {
+        this.dotFrame = 0;
+        const render = () => {
+          const dots = '.'.repeat(this.dotFrame % 4);
+          this.statusRowEl.innerHTML = `<span class="album-ring"></span> Procesando${dots}`;
+          this.dotFrame++;
+        };
+        render();
+        this.dotTimer = setInterval(render, 450);
+      } else if (ready < this.numPhotos) {
+        const falta = this.numPhotos - ready;
+        this.statusRowEl.innerHTML = `<span class="album-dot"></span> Te falta ${falta} foto${falta > 1 ? 's' : ''}`;
+      } else {
+        this.statusRowEl.innerHTML = `<span class="album-dot album-is-filled"></span> ¡Listo, muy lindas fotos!`;
+      }
+    }
+
+    // ---------- paso 2 ----------
+
+    renderStamp() {
+      this.closeStampEdit();
+      if (this.photos.length === 0) return;
+      const original = this.photos[this.coverIndex];
+      const cover = this.coverOverrides.get(original.id);
+      this.stampPhotoEl.src = (cover ? cover.blobUrl : original.blobUrl) || '';
+      this.renderGhosts();
+    }
+
+    renderGhosts() {
+      if (this.photos.length === 0) return;
+      if (this.coverIndex > 0) {
+        this.ghostPrevImgEl.src = this.photos[this.coverIndex - 1].blobUrl || '';
+        this.ghostPrevEl.classList.add('album-is-visible');
+      } else {
+        this.ghostPrevEl.classList.remove('album-is-visible');
+      }
+
+      if (this.coverIndex < this.photos.length - 1) {
+        this.ghostNextImgEl.src = this.photos[this.coverIndex + 1].blobUrl || '';
+        this.ghostNextEl.classList.add('album-is-visible');
+      } else {
+        this.ghostNextEl.classList.remove('album-is-visible');
+      }
+    }
+
+    goPrevPhoto() {
+      this.coverIndex = Math.max(0, this.coverIndex - 1);
+      this.renderStamp();
+    }
+    goNextPhoto() {
+      this.coverIndex = Math.min(this.photos.length - 1, this.coverIndex + 1);
+      this.renderStamp();
+    }
+
+    // ---------- navegación ----------
+
+    goToStep(stepNum) {
+      this.root.querySelectorAll('[data-panel]').forEach((panel) => {
+        const isTarget = panel.dataset.panel === stepNum;
+        panel.classList.toggle('album-is-active', isTarget);
+        panel.classList.remove('album-is-shown');
+      });
+      this.root.querySelectorAll('[data-seg]').forEach((seg) => {
+        seg.classList.toggle('album-is-done', seg.dataset.seg <= stepNum);
+      });
+      this.root.classList.toggle('album-step-3', stepNum === '3');
+
+      if (stepNum === '2') this.renderStamp();
+      if (stepNum === '3') {
+        this.renderFinal();
+        this.launchConfetti();
+      }
+
+      const activePanel = this.root.querySelector('[data-panel].album-is-active');
+      if (activePanel) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => activePanel.classList.add('album-is-shown'));
+        });
+      }
+    }
+
+    renderFinal() {
+      const original = this.photos[this.coverIndex];
+      if (!original || !this.finalCoverEl) return;
+      const cover = this.coverOverrides.get(original.id);
+      this.finalCoverEl.src = (cover ? cover.blobUrl : original.blobUrl) || '';
+    }
+
+    // ---------- subida a imgbb (solo al comprar) + carrito ----------
+
+    // Vuelve a renderizar UNA foto en alta resolución, releyendo el archivo original
+    // (no la copia liviana de 600px que vive en memoria durante la edición) y aplicando
+    // los mismos ajustes guardados (rotación, espejo, zoom, encuadre). Se usa solo al
+    // comprar, una foto a la vez, y libera explícitamente los canvases pesados apenas
+    // termina — así nunca hay más de un canvas de alta resolución vivo a la vez.
+    async renderFinalBlob(photoLike) {
+      const highRes = await this.loadHighResSource(photoLike.file);
+      const { canvas: rotatedCanvas, width, height } = this.buildRotatedCanvas(photoLike, highRes.canvas);
+      const blob = await this.cropCanvasToBlob(rotatedCanvas, width, height, photoLike.offsetX, photoLike.offsetY, photoLike.zoom);
+
+      // Limpieza explícita: liberar la memoria del canvas antes de pasar a la próxima foto.
+      rotatedCanvas.width = 0;
+      rotatedCanvas.height = 0;
+      highRes.canvas.width = 0;
+      highRes.canvas.height = 0;
+
+      return blob;
+    }
+
+    uploadToImgbb(blob) {
+      const formData = new FormData();
+      formData.append('image', blob);
+      // Con el Worker, "expiration" va como campo del FormData (el Worker lo
+      // acota entre 60 y 15552000 segundos y se lo pasa a imgbb).
+      formData.append('expiration', String(Math.min(15552000, Math.max(60, this.expirationSeconds))));
+      return fetch(this.imgbbProxyUrl, {
+        method: 'POST',
+        body: formData,
+      })
+        .then((res) => res.text())
+        .then((texto) => {
+          let data;
+          try {
+            data = JSON.parse(texto);
+          } catch (parseErr) {
+            throw new Error('imgbb no devolvió JSON (respondió: "' + texto.slice(0, 120) + '")');
+          }
+          if (data && data.success && data.data && data.data.url) return data.data.url;
+          const apiMsg = data && data.error && data.error.message;
+          throw new Error(apiMsg || 'Respuesta inválida de imgbb');
+        })
+        .catch((err) => {
+          // Siempre relanzamos un Error "limpio" (solo string), nunca el objeto de
+          // red/FormData original: en algunos entornos de preview/sandbox, intentar
+          // loguear o reenviar ese objeto crudo entre frames (postMessage) revienta
+          // con "DataCloneError: FormData object could not be cloned".
+          throw new Error(err && err.message ? err.message : 'No se pudo subir la foto a imgbb');
+        });
+    }
+
+    // Sube las fotos pendientes DE A UNA (secuencial, no en paralelo): cada foto se
+    // regenera en alta resolución justo antes de subirla (renderFinalBlob) y ese
+    // canvas pesado se libera antes de pasar a la siguiente. Procesar 40 fotos en
+    // paralelo (Promise.all) es lo que hace crashear Safari/iOS por RAM; uno a la vez
+    // mantiene el consumo de memoria acotado sin importar cuántas fotos tenga el álbum.
+    async uploadAllPhotos(items, onProgress) {
+      const total = items.length;
+      let completed = items.filter((p) => p.status === 'done').length;
+      this.setUploadProgress(completed, total);
+      if (onProgress) onProgress(completed, total);
+
+      for (const photo of items) {
+        if (photo.status === 'done') continue;
+
+        let attempt = 0;
+        for (;;) {
+          attempt++;
+          try {
+            const blob = await this.renderFinalBlob(photo);
+            photo.blob = blob;
+            const url = await this.uploadToImgbb(blob);
+            photo.url = url;
+            photo.status = 'done';
+            completed++;
+            this.setUploadProgress(completed, total);
+            if (onProgress) onProgress(completed, total);
+            break;
+          } catch (err) {
+            if (attempt > MAX_RETRIES) throw err;
+          }
+        }
+      }
+    }
+
+    setUploadProgress(completed, total) {
+      const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+      if (this.uploadBarEl) this.uploadBarEl.style.width = pct + '%';
+      if (this.uploadTextEl) this.uploadTextEl.textContent = `Subiendo tus fotos... ${completed}/${total}`;
+    }
+
+    showUploadOverlay() {
+      if (!this.uploadOverlayEl) return;
+      this.uploadBoxEl.classList.remove('album-is-done');
+      if (this.uploadBarEl) this.uploadBarEl.style.width = '0%';
+      this.uploadOverlayEl.hidden = false;
+      requestAnimationFrame(() => this.uploadOverlayEl.classList.add('album-is-visible'));
+    }
+
+    hideUploadOverlay() {
+      if (!this.uploadOverlayEl) return;
+      this.uploadOverlayEl.classList.remove('album-is-visible');
+      setTimeout(() => {
+        this.uploadOverlayEl.hidden = true;
+      }, 250);
+    }
+
+    showUploadCheck() {
+      if (this.uploadBoxEl) this.uploadBoxEl.classList.add('album-is-done');
+    }
+
+    wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async addToCart() {
+      this.cartErrorEl.hidden = true;
+
+      const allReady =
+        this.photos.length === this.numPhotos && this.photos.every((p) => p.status === 'ready' || p.status === 'done');
+      if (!allReady) {
+        this.cartErrorEl.textContent = 'Faltan fotos por preparar.';
+        this.cartErrorEl.hidden = false;
+        return;
+      }
+
+      const originalCover = this.photos[this.coverIndex];
+      if (!originalCover) {
+        this.cartErrorEl.textContent = 'Selecciona una portada.';
+        this.cartErrorEl.hidden = false;
+        return;
+      }
+
+      try {
+        // OJO: acá NO se sube nada todavía. Solo "horneamos" la portada final
+        // (recorte/rotación ya aplicados, como blob local) para poder mostrar
+        // una vista previa inmediata en el checkout. La subida real a imgbb de
+        // las 40 fotos + portada ocurre recién al confirmar la compra (ver
+        // subirFotosPendientes más abajo), justo antes de generar el número
+        // de pedido — así todo se sube junto con el comprobante de pago.
+        const coverPhoto = await this.ensureCoverOverride(originalCover);
+        this.pendingCoverPhoto = coverPhoto;
+
+        if (typeof window.onAlbumWizardComplete === 'function') {
+          window.onAlbumWizardComplete(coverPhoto.blobUrl);
+        }
+      } catch (err) {
+        console.error('Error al preparar la portada:', err && err.message ? err.message : err);
+        this.cartErrorEl.textContent = 'Hubo un problema preparando tu portada. Intenta de nuevo.';
+        this.cartErrorEl.hidden = false;
+      }
+    }
+
+    // Sube de verdad las 40 fotos + portada a imgbb. La llama el checkout
+    // (en el script de más abajo) justo al confirmar la compra, junto con la
+    // subida del comprobante de pago.
+    async subirFotosPendientes(onProgress) {
+      const originalCover = this.photos[this.coverIndex];
+      const coverPhoto = this.pendingCoverPhoto || (await this.ensureCoverOverride(originalCover));
+
+      const itemsToUpload = [...this.photos, coverPhoto];
+      await this.uploadAllPhotos(itemsToUpload, onProgress);
+
+      const properties = { Portada: coverPhoto.url };
+      this.photos.forEach((photo, index) => {
+        const label = 'Foto ' + String(index + 1).padStart(2, '0');
+        properties[label] = photo.url;
+      });
+      return properties;
+    }
+  }
+
+  // Guardamos la instancia en window: el script del checkout (más abajo en
+  // este mismo archivo) necesita llamar a subirFotosPendientes() recién al
+  // confirmar la compra.
+  document.querySelectorAll('.album-wizard').forEach((root) => {
+    window.albumWizardInstance = new AlbumWizard(root);
+  });
+})();
+
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =====================================================================
+     DATOS DE RELLENO (producto)
+     Reemplaza esto por los datos reales del producto cuando lo conectes.
+     ===================================================================== */
+  const PRODUCT = {
+    title: 'Álbum de 40 Fotos + Portada Personalizada',
+    priceFinal: 9990,
+    pricePrev: 13990,
+    images: [
+      'https://i.ibb.co/PsPkKDVs/album1.webp',
+      'https://i.ibb.co/jvcTcbTS/album2.webp',
+      'https://i.ibb.co/s9f1LHCc/album3.webp',
+      'https://i.ibb.co/tMnTDf4T/album4.webp',
+    ],
+  };
+
+  function formatCLP(n) {
+    return '$' + n.toLocaleString('es-CL');
+  }
+
+  /* ---------------------- estado simple ---------------------- */
+  const state = {
+    qty: 1,
+    comprobanteFile: null,
+    comprobanteDataUrl: null,
+    tipoEntrega: 'Envío a domicilio', // 'Retiro' | 'Envío a domicilio' | 'Envío a sucursal'
+    costoEnvio: null,
+  };
+
+  /* ---------------------- tarifas de envío (Blue Express) ----------------------
+     Lógica geográfica desde Temuco (origen), de norte a sur:
+       - Misma región (La Araucanía): la más barata.
+       - Entre Copiapó y Puerto Montt (sin contar Araucanía): tarifa media.
+       - Los extremos (Arica-Antofagasta y Aysén-Magallanes): la más cara.
+     El envío a un punto Blue Express siempre sale $500 más barato que a
+     domicilio, en cualquiera de los 3 tramos. */
+  const REGIONES_TIER1 = ['La Araucanía'];
+  const REGIONES_TIER2 = [
+    'Atacama', 'Coquimbo', 'Valparaíso', 'Metropolitana de Santiago',
+    "Libertador General Bernardo O'Higgins", 'Maule', 'Ñuble', 'Biobío',
+    'Los Ríos', 'Los Lagos',
+  ];
+  const REGIONES_TIER3 = [
+    'Arica y Parinacota', 'Tarapacá', 'Antofagasta',
+    'Aysén', 'Magallanes y de la Antártica Chilena',
+  ];
+  const TARIFAS_ENVIO = {
+    1: { domicilio: 3100, sucursal: 2600 },
+    2: { domicilio: 4300, sucursal: 3800 },
+    3: { domicilio: 5200, sucursal: 4700 },
+  };
+
+  function tierDeRegion(region) {
+    if (REGIONES_TIER1.includes(region)) return 1;
+    if (REGIONES_TIER2.includes(region)) return 2;
+    if (REGIONES_TIER3.includes(region)) return 3;
+    return null;
+  }
+
+  /* ---------------------- navegación entre pantallas ---------------------- */
+  const screens = {
+    product: document.getElementById('screen-product'),
+    checkout: document.getElementById('screen-checkout'),
+    confirm: document.getElementById('screen-confirm'),
+  };
+
+  function showScreen(name) {
+    Object.values(screens).forEach((el) => el.classList.remove('is-active'));
+    screens[name].classList.add('is-active');
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+  }
+
+  /* ---------------------- galería ---------------------- */
+  const galleryMainImg = document.getElementById('galleryMainImg');
+  const galleryThumbs = document.getElementById('galleryThumbs');
+
+  function renderGallery() {
+    galleryThumbs.innerHTML = '';
+    PRODUCT.images.forEach((src, i) => {
+      const btn = document.createElement('button');
+      btn.className = i === 0 ? 'is-active' : '';
+      btn.innerHTML = '<img src="' + src + '" alt="">';
+      btn.addEventListener('click', () => {
+        galleryMainImg.src = src;
+        galleryThumbs.querySelectorAll('button').forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+      });
+      galleryThumbs.appendChild(btn);
+    });
+  }
+  renderGallery();
+
+  /* ---------------------- precio + cantidad ---------------------- */
+  document.getElementById('priceFinal').textContent = formatCLP(PRODUCT.priceFinal);
+  document.getElementById('pricePrev').textContent = formatCLP(PRODUCT.pricePrev);
+  const discountPct = Math.round((1 - PRODUCT.priceFinal / PRODUCT.pricePrev) * 100);
+  document.getElementById('priceBadge').textContent = discountPct + '% OFF';
+
+  /* ---------------------- resumen del pedido ----------------------
+     El envío es "por pagar" (se paga al recibir/retirar, no acá), así que
+     el Total que se cobra por transferencia es SOLO el producto — el costo
+     de envío se muestra aparte, en cada tarjeta, como referencia. */
+  function actualizarResumenPedido() {
+    const subtotal = PRODUCT.priceFinal * state.qty;
+    const qtyTexto = state.qty + (state.qty === 1 ? ' copia' : ' copias');
+    document.getElementById('orderQtyTextTop').textContent = qtyTexto;
+    document.getElementById('orderTotalTextTop').textContent = formatCLP(subtotal);
+    // Con retiro presencial no hay envío, así que no se menciona.
+    const envioTexto = state.tipoEntrega === 'Retiro' ? '' : ' + envío por pagar';
+    document.getElementById('orderQtyText').textContent = qtyTexto + envioTexto;
+    document.getElementById('orderTotalText').textContent = formatCLP(subtotal);
+    actualizarPreciosEnvio();
+  }
+
+  function actualizarPreciosEnvio() {
+    const region = document.getElementById('region').value;
+    const tier = tierDeRegion(region);
+    const precioDomicilioEl = document.getElementById('precioDomicilio');
+    const precioSucursalEl = document.getElementById('precioSucursal');
+
+    if (!tier) {
+      precioDomicilioEl.textContent = '-- aprox';
+      precioSucursalEl.textContent = '-- aprox';
+      state.costoEnvio = 0;
+      return;
+    }
+
+    precioDomicilioEl.textContent = formatCLP(TARIFAS_ENVIO[tier].domicilio) + ' aprox';
+    precioSucursalEl.textContent = formatCLP(TARIFAS_ENVIO[tier].sucursal) + ' aprox';
+
+    if (state.tipoEntrega === 'Envío a sucursal') state.costoEnvio = TARIFAS_ENVIO[tier].sucursal;
+    else if (state.tipoEntrega === 'Envío a domicilio') state.costoEnvio = TARIFAS_ENVIO[tier].domicilio;
+    else state.costoEnvio = 0;
+  }
+
+  /* ---------------------- 3 opciones: domicilio / sucursal / retiro ----------------------
+     Los campos de dirección (región/comuna/dirección/depto) son iguales y
+     obligatorios para las 3 opciones, y conservan lo que la persona
+     escribió aunque cambie de opción. */
+  function actualizarOpcionEntrega() {
+    const seleccionado = document.querySelector('input[name="tipoEntregaOpcion"]:checked').value;
+    const esRetiro = seleccionado === 'retiro';
+
+    state.tipoEntrega = esRetiro ? 'Retiro' : (seleccionado === 'sucursal' ? 'Envío a sucursal' : 'Envío a domicilio');
+
+    actualizarResumenPedido();
+  }
+  document.querySelectorAll('input[name="tipoEntregaOpcion"]').forEach((radio) => {
+    radio.addEventListener('change', actualizarOpcionEntrega);
+  });
+
+  document.getElementById('region').addEventListener('change', () => {
+    clearFieldError('group-region');
+    actualizarResumenPedido();
+  });
+
+  const qtyValueEl = document.getElementById('qtyValue');
+  document.getElementById('qtyMinus').addEventListener('click', () => {
+    state.qty = Math.max(1, state.qty - 1);
+    qtyValueEl.textContent = state.qty;
+    actualizarResumenPedido();
+  });
+  document.getElementById('qtyPlus').addEventListener('click', () => {
+    state.qty = Math.min(10, state.qty + 1);
+    qtyValueEl.textContent = state.qty;
+    actualizarResumenPedido();
+  });
+
+  /* ---------------------- del wizard de fotos al checkout ----------------------
+     El wizard de armado del álbum (embebido más arriba) llama a
+     window.onAlbumWizardComplete(previewUrl) al elegir "Comprar" en el paso 3.
+     Ojo: "previewUrl" es solo una vista previa LOCAL (un blob: URL) de la
+     portada — todavía no se subió nada a imgbb. La subida real de las 40
+     fotos + portada pasa recién al confirmar la compra más abajo (ver
+     checkoutForm submit), junto con el comprobante de pago. */
+  window.onAlbumWizardComplete = function (previewUrl) {
+    if (previewUrl) {
+      document.getElementById('orderSummaryImg').src = previewUrl;
+      document.getElementById('orderSummaryImgTop').src = previewUrl;
+    }
+    actualizarResumenPedido();
+    showScreen('checkout');
+  };
+
+  document.getElementById('backToProduct').addEventListener('click', () => showScreen('product'));
+  document.getElementById('logoLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    showScreen('product');
+  });
+  document.getElementById('confirmBack').addEventListener('click', () => {
+    document.getElementById('checkoutForm').reset();
+    resetUploadBox();
+    showScreen('product');
+  });
+
+  /* ---------------------- comprobante de pago ---------------------- */
+  const comprobanteInput = document.getElementById('comprobante');
+  const uploadBox = document.getElementById('uploadBox');
+  const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+  const uploadPreview = document.getElementById('uploadPreview');
+  const uploadPreviewImg = document.getElementById('uploadPreviewImg');
+  const uploadPreviewName = document.getElementById('uploadPreviewName');
+
+  /* El botón de pagar solo se habilita con un comprobante adjunto
+     (y se bloquea mientras se envía el pedido). */
+  function refrescarBotonPago() {
+    const submitBtnEl = document.getElementById('submitBtn');
+    const submitHintEl = document.getElementById('submitHint');
+    submitBtnEl.disabled = !state.comprobanteFile || state.enviando === true;
+    if (submitHintEl) submitHintEl.hidden = !!state.comprobanteFile;
+  }
+
+  function resetUploadBox() {
+    state.comprobanteFile = null;
+    state.comprobanteDataUrl = null;
+    comprobanteInput.value = '';
+    uploadBox.classList.remove('has-file');
+    uploadPlaceholder.style.display = 'block';
+    uploadPreview.style.display = 'none';
+    refrescarBotonPago();
+  }
+
+  comprobanteInput.addEventListener('change', () => {
+    const file = comprobanteInput.files[0];
+    if (!file) return;
+    state.comprobanteFile = file;
+    refrescarBotonPago();
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.comprobanteDataUrl = reader.result; // usada solo para la vista previa
+      uploadPreviewImg.src = reader.result;
+      uploadPreviewName.textContent = file.name;
+      uploadBox.classList.add('has-file');
+      uploadPlaceholder.style.display = 'none';
+      uploadPreview.style.display = 'flex';
+      clearFieldError('group-comprobante');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('uploadRemove').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    resetUploadBox();
+  });
+
+  /* ---------------------- validación del formulario ---------------------- */
+  function setFieldError(groupId, hasError) {
+    document.getElementById(groupId).classList.toggle('has-error', hasError);
+  }
+  function clearFieldError(groupId) {
+    setFieldError(groupId, false);
+  }
+
+  function validateForm() {
+    let ok = true;
+    const nombre = document.getElementById('nombre').value.trim();
+    const apellido = document.getElementById('apellido').value.trim();
+    const correo = document.getElementById('correo').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Solo dígitos, con o sin espacios: acepta "9 1234 5678" o "912345678".
+    const phoneDigits = telefono.replace(/\D/g, '');
+
+    setFieldError('group-nombre', nombre.length < 2); if (nombre.length < 2) ok = false;
+    setFieldError('group-apellido', apellido.length < 2); if (apellido.length < 2) ok = false;
+    setFieldError('group-correo', !emailRe.test(correo)); if (!emailRe.test(correo)) ok = false;
+    setFieldError('group-telefono', phoneDigits.length < 8); if (phoneDigits.length < 8) ok = false;
+    setFieldError('group-comprobante', !state.comprobanteFile); if (!state.comprobanteFile) ok = false;
+
+    // Región/comuna/dirección: se piden SIEMPRE, sea cual sea el tipo de
+    // entrega (domicilio, sucursal o retiro), para tener los datos del
+    // cliente si algo sale mal y para armar la etiqueta.
+    const region = document.getElementById('region').value;
+    const comuna = document.getElementById('comuna').value.trim();
+    const direccion = document.getElementById('direccion').value.trim();
+
+    setFieldError('group-region', !region); if (!region) ok = false;
+    setFieldError('group-comuna', comuna.length < 2); if (comuna.length < 2) ok = false;
+    setFieldError('group-direccion', direccion.length < 5); if (direccion.length < 5) ok = false;
+
+    return ok;
+  }
+
+  /* =====================================================================
+     ENVÍO DEL PEDIDO (real)
+     1) Sube el comprobante a imgbb, a través del mismo Worker que usa el wizard de fotos.
+     2) Manda el pedido completo (datos + links de fotos + link del
+        comprobante) al Apps Script de Memoria Mensajera. Ese script agrega
+        la fila al Sheet y dispara los correos (interno + al cliente).
+
+     Ojo con el Content-Type: 'text/plain' es a propósito, no un error. Si
+     se manda como 'application/json', el navegador hace un preflight OPTIONS
+     antes del POST, y los Web Apps de Apps Script no responden ese preflight
+     -> la petición nunca llega. Con 'text/plain' el navegador la manda
+     directo, y el propio Apps Script igual la lee bien con JSON.parse().
+     ===================================================================== */
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBe2qNWZuEoolD3FdmBJUDebwcRmKZmIflxZOd-EcHoNcIS2RtcMfjpuycvcWci6IU/exec';
+  const IMGBB_PROXY_URL = document.getElementById('album-wizard-main').dataset.imgbbProxyUrl;
+  const CORREO_CONTACTO = 'davidfuentespoza@gmail.com';
+  const COMPROBANTE_EXPIRATION_SEGUNDOS = 7 * 24 * 60 * 60; // 1 semana, igual que las fotos del álbum
+
+  async function subirBlobAImgbb(blob) {
+    const fd = new FormData();
+    fd.append('image', blob);
+    fd.append('expiration', String(COMPROBANTE_EXPIRATION_SEGUNDOS));
+    const res = await fetch(IMGBB_PROXY_URL, {
+      method: 'POST',
+      body: fd,
+    });
+    const texto = await res.text();
+    let data;
+    try {
+      data = JSON.parse(texto);
+    } catch (parseErr) {
+      // imgbb no devolvió JSON (típico si se cae el límite de la key gratis,
+      // o si hay algún bloqueo de red/proxy en el camino).
+      throw new Error('imgbb no devolvió JSON (respondió: "' + texto.slice(0, 120) + '")');
+    }
+    if (data && data.success && data.data && data.data.url) return data.data.url;
+    const apiMsg = data && data.error && data.error.message;
+    throw new Error(apiMsg || 'No se pudo subir la imagen a imgbb');
+  }
+
+  /* =====================================================================
+     COMPRIMIR EL COMPROBANTE DE PAGO
+     El comprobante suele ser un screenshot del celular, que puede pesar
+     varios MB sin ninguna necesidad: es una imagen que solo hay que poder
+     leer. Lo redimensionamos a 1600px de lado máximo y lo pasamos a JPEG
+     de calidad 0.8, con lo que normalmente baja de varios MB a unos pocos
+     cientos de KB. Eso hace la subida más rápida y el correo más liviano.
+     ===================================================================== */
+  const COMPROBANTE_LADO_MAX = 1600;
+  const COMPROBANTE_CALIDAD = 0.8;
+
+  function comprimirComprobante(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+
+        const escala = Math.min(1, COMPROBANTE_LADO_MAX / Math.max(img.width, img.height));
+        const ancho = Math.round(img.width * escala);
+        const alto = Math.round(img.height * escala);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = ancho;
+        canvas.height = alto;
+        const ctx = canvas.getContext('2d');
+        // Fondo blanco: si el original es PNG con transparencia, al pasar a
+        // JPEG esas zonas quedarían negras sin esto.
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, ancho, alto);
+        ctx.drawImage(img, 0, 0, ancho, alto);
+
+        canvas.toBlob(
+          (blob) => {
+            // Si por alguna razón comprimir no ayudó, usamos el original.
+            if (!blob || blob.size >= file.size) resolve(file);
+            else resolve(blob);
+          },
+          'image/jpeg',
+          COMPROBANTE_CALIDAD
+        );
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('No se pudo leer la imagen del comprobante'));
+      };
+
+      img.src = objectUrl;
+    });
+  }
+
+  const form = document.getElementById('checkoutForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitBtnText = document.getElementById('submitBtnText');
+  const checkoutErrorEl = document.getElementById('checkoutError');
+  const checkoutProgressRow = document.getElementById('checkoutProgressRow');
+  const checkoutProgressFill = document.getElementById('checkoutProgressFill');
+  const checkoutProgressLabel = document.getElementById('checkoutProgressLabel');
+
+  function actualizarProgresoFotos(completadas, total) {
+    checkoutProgressRow.hidden = false;
+    const pct = total > 0 ? Math.round((completadas / total) * 100) : 0;
+    checkoutProgressFill.style.width = pct + '%';
+    checkoutProgressLabel.textContent = 'Subiendo fotos del álbum... ' + completadas + '/' + total;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!state.comprobanteFile) { setFieldError('group-comprobante', true); refrescarBotonPago(); return; }
+    if (!validateForm()) return;
+
+    checkoutErrorEl.hidden = true;
+    checkoutProgressRow.hidden = true;
+    checkoutProgressFill.style.width = '0%';
+    state.enviando = true;
+    refrescarBotonPago();
+    submitBtn.classList.add('is-loading');
+
+    try {
+      // 1) Recién ahora se suben de verdad las 40 fotos + portada a imgbb
+      //    (hasta este momento solo existían como blobs en el navegador).
+      submitBtnText.textContent = 'Subiendo fotos del álbum...';
+      let fotos;
+      try {
+        fotos = await window.albumWizardInstance.subirFotosPendientes(actualizarProgresoFotos);
+      } catch (err) {
+        throw new Error('Al subir las fotos del álbum: ' + (err && err.message ? err.message : err));
+      }
+      checkoutProgressRow.hidden = true; // el resto de los pasos son subidas únicas, sin progreso incremental
+
+      // 2) El comprobante de pago: primero se comprime (suele venir como
+      //    screenshot pesado del celular) y después se sube.
+      //    El sobre ya NO se genera acá: lo arma el script .py que llega
+      //    adjunto en el correo, para no hacer esperar a quien compra.
+      submitBtnText.textContent = 'Subiendo comprobante...';
+      let comprobanteUrl;
+      try {
+        const comprobanteComprimido = await comprimirComprobante(state.comprobanteFile);
+        comprobanteUrl = await subirBlobAImgbb(comprobanteComprimido);
+      } catch (err) {
+        throw new Error('Al subir el comprobante de pago: ' + (err && err.message ? err.message : err));
+      }
+
+      const correo = document.getElementById('correo').value.trim();
+      const subtotalProductos = PRODUCT.priceFinal * state.qty;
+
+      const payload = {
+        nombre: document.getElementById('nombre').value.trim(),
+        apellido: document.getElementById('apellido').value.trim(),
+        correo: correo,
+        telefono: '+56 ' + document.getElementById('telefono').value.trim(),
+        tipoEntrega: state.tipoEntrega,
+        // La dirección se envía siempre, también con Retiro / Sucursal.
+        region: document.getElementById('region').value,
+        comuna: document.getElementById('comuna').value.trim(),
+        direccion: document.getElementById('direccion').value.trim(),
+        depto: document.getElementById('depto').value.trim(),
+        cantidad: state.qty,
+        total: subtotalProductos, // el envío es "por pagar" (al recibir/retirar), no se cobra acá
+        // Portada + Foto 01..40 + Sobre: links reales en imgbb, recién subidos arriba.
+        fotos: fotos,
+        comprobanteUrl: comprobanteUrl,
+      };
+
+      submitBtnText.textContent = 'Enviando pedido...';
+      let resultado;
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload),
+        });
+        const textoRespuesta = await res.text();
+        try {
+          resultado = JSON.parse(textoRespuesta);
+        } catch (parseErr) {
+          // El servidor no devolvió JSON (típicamente una página de Google
+          // pidiendo iniciar sesión, o un error 500/403). Mostramos el
+          // arranque de esa respuesta para poder diagnosticar qué fue.
+          throw new Error('el servidor no devolvió JSON (respondió: "' + textoRespuesta.slice(0, 120) + '")');
+        }
+      } catch (err) {
+        throw new Error('Al registrar el pedido en el Sheet: ' + (err && err.message ? err.message : err));
+      }
+      if (!resultado.ok) throw new Error('Al registrar el pedido en el Sheet: ' + (resultado.error || 'error desconocido'));
+
+      document.getElementById('confirmOrderId').textContent = resultado.numPedido;
+      document.getElementById('confirmEmail').textContent = correo;
+
+      state.enviando = false;
+      refrescarBotonPago();
+      submitBtn.classList.remove('is-loading');
+      submitBtnText.textContent = 'Pagar ahora';
+
+      showScreen('confirm');
+    } catch (err) {
+      console.error('Error al enviar el pedido:', err && err.message ? err.message : err);
+      checkoutProgressRow.hidden = true;
+      checkoutErrorEl.textContent =
+        'No pudimos completar tu compra (' + (err && err.message ? err.message : 'error desconocido') + '). Intenta de nuevo o escríbenos a ' + CORREO_CONTACTO + '.';
+      checkoutErrorEl.hidden = false;
+      state.enviando = false;
+      refrescarBotonPago();
+      submitBtn.classList.remove('is-loading');
+      submitBtnText.textContent = 'Pagar ahora';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
