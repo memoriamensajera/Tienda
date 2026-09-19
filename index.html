@@ -363,7 +363,9 @@
     border-radius:8px;font-weight:700;font-size:16px;cursor:pointer;margin-top:8px;
     display:flex;align-items:center;justify-content:center;gap:10px;
   }
-  .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+  /* is-blocked: se ve apagado (falta el comprobante) pero se puede presionar, para poder mostrar qué falta */
+  .submit-btn:disabled,
+  .submit-btn.is-blocked{opacity:.5;cursor:not-allowed;}
   .submit-hint{font-size:12.5px;color:#8a8a8a;margin:10px 0 0;text-align:center;}
   .submit-hint[hidden]{display:none;}
   .submit-btn .spinner{
@@ -1250,7 +1252,7 @@
 
         <p class="checkout-error" id="checkoutError" hidden></p>
 
-        <button type="submit" class="submit-btn" id="submitBtn" disabled>
+        <button type="submit" class="submit-btn is-blocked" id="submitBtn" aria-disabled="true">
           <span class="spinner"></span>
           <span id="submitBtnText">Pagar ahora</span>
         </button>
@@ -2882,7 +2884,12 @@
   function refrescarBotonPago() {
     const submitBtnEl = document.getElementById('submitBtn');
     const submitHintEl = document.getElementById('submitHint');
-    submitBtnEl.disabled = !state.comprobanteFile || state.enviando === true;
+    // Sin comprobante el botón se ve apagado y NO envía nada, pero sigue siendo
+    // presionable: así, al tocarlo, aparece el aviso de lo que falta completar.
+    // Solo se deshabilita de verdad mientras se está enviando el pedido.
+    submitBtnEl.disabled = state.enviando === true;
+    submitBtnEl.classList.toggle('is-blocked', !state.comprobanteFile);
+    submitBtnEl.setAttribute('aria-disabled', state.comprobanteFile ? 'false' : 'true');
     if (submitHintEl) submitHintEl.hidden = !!state.comprobanteFile;
   }
 
