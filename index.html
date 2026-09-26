@@ -4,9 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Álbum de 40 Fotos + Portada Personalizada</title>
+<meta name="description" content="Álbum de fotos personalizado de 40 fotos con portada a tu gusto. Envío a domicilio o retiro en Temuco. Pídelo en minutos, sube tus fotos y arma tu recuerdo.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Álbum de 40 Fotos + Portada Personalizada",
+  "description": "Álbum de fotos personalizado de 40 fotos con portada a tu gusto, ideal para regalos y recuerdos compartidos.",
+  "image": "https://memoriamensajera.cl/assets/img/album-1.webp",
+  "brand": {
+    "@type": "Brand",
+    "name": "Memoria Mensajera"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "https://memoriamensajera.cl/",
+    "priceCurrency": "CLP",
+    "price": "9990",
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+}
+</script>
 <style>
   :root{
     --blue-deep:#3B62C4;
@@ -135,9 +157,9 @@
   }
   .price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:22px;}
   .price-final{font-size:26px;font-weight:700;color:var(--blue-deep);}
-  .price-prev{font-size:16px;color:#8A8A8A;text-decoration:line-through;}
+  .price-prev{font-size:16px;color:#6b6b6b;text-decoration:line-through;}
   .price-badge{
-    font-size:12px;font-weight:600;color:var(--blue-deep);
+    font-size:12px;font-weight:600;color:#1c3f91;
     background:var(--blue-bg);padding:3px 9px;border-radius:99px;
   }
 
@@ -375,7 +397,7 @@
   .submit-btn.is-loading .spinner{display:inline-block;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  .form-note{font-size:12.5px;color:#8a8a8a;margin-top:14px;text-align:center;line-height:1.55;}
+  .form-note{font-size:12.5px;color:#6b6b6b;margin-top:14px;text-align:center;line-height:1.55;}
   .form-note a{color:var(--blue-deep);font-weight:600;text-decoration:underline;}
 
   .checkout-error{
@@ -871,7 +893,7 @@
 <body>
 
 <header class="site-header">
-  <a href="#" class="logo" id="logoLink"><img src="assets/img/logo.png" alt="Memoria Mensajera"></a>
+  <a href="#" class="logo" id="logoLink"><img src="assets/img/logo.png" alt="Memoria Mensajera" width="182" height="55"></a>
 </header>
 
 <main>
@@ -881,7 +903,7 @@
     <div class="product">
       <div class="gallery">
         <div class="gallery-main">
-          <img id="galleryMainImg" src="assets/img/album-1.webp" alt="Álbum de fotos personalizado">
+          <img id="galleryMainImg" src="assets/img/album-1.webp" alt="Álbum de fotos personalizado" fetchpriority="high">
         </div>
         <div class="gallery-thumbs" id="galleryThumbs"></div>
       </div>
@@ -1079,7 +1101,7 @@
       <p class="checkout-sub">Te pediremos tus datos de envío y el comprobante de tu pago.</p>
 
       <div class="order-summary">
-        <img id="orderSummaryImgTop" src="assets/img/album-1.webp" alt="">
+        <img id="orderSummaryImgTop" src="assets/img/album-1.webp" alt="" loading="lazy" width="56" height="56">
         <div class="order-summary-text">
           <strong>Álbum de 40 Fotos + Portada Personalizada</strong>
           <span id="orderQtyTextTop">1 copia</span>
@@ -1235,7 +1257,7 @@
         </div>
 
         <div class="order-summary">
-          <img id="orderSummaryImg" src="assets/img/album-1.webp" alt="">
+          <img id="orderSummaryImg" src="assets/img/album-1.webp" alt="" loading="lazy" width="56" height="56">
           <div class="order-summary-text">
             <strong>Total</strong>
             <span id="orderQtyText">1 copia + envío por pagar</span>
@@ -2757,7 +2779,8 @@
     PRODUCT.images.forEach((src, i) => {
       const btn = document.createElement('button');
       btn.className = i === 0 ? 'is-active' : '';
-      btn.innerHTML = '<img src="' + src + '" alt="">';
+      btn.setAttribute('aria-label', 'Ver foto ' + (i + 1) + ' del álbum');
+      btn.innerHTML = '<img src="' + src + '" alt="" loading="lazy">';
       btn.addEventListener('click', () => {
         galleryMainImg.src = src;
         galleryThumbs.querySelectorAll('button').forEach((b) => b.classList.remove('is-active'));
