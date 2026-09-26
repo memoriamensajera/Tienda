@@ -1,25 +1,31 @@
 # Memoria Mensajera
 
-> Tienda online chilena que vende álbumes de fotos físicos personalizados: el cliente sube sus fotos y elige la portada, y recibe un álbum impreso armado a mano.
+> Tienda online chilena de álbumes de fotos físicos personalizados. El cliente sube sus imágenes, personaliza la portada y recibe un álbum impreso armado a mano.
 
-## Producto
+## Productos y Precios
 
-- Álbum de 40 Fotos + Portada Personalizada — $9.990 CLP (precio normal $13.990 CLP)
-  URL de compra: https://memoriamensajera.cl/
-  El cliente sube hasta 40 fotos y elige/personaliza la portada directamente en el sitio, en un flujo de un solo paso (sin necesidad de crear cuenta).
+- **Álbum de 40 Fotos + Portada Personalizada**
+  - **Precio en oferta:** $9.990 CLP
+  - **Precio normal:** $13.990 CLP
+  - **URL de compra:** https://memoriamensajera.cl/
+  - **Proceso:** El cliente sube hasta 40 fotos y personaliza la portada en un flujo continuo de un solo paso, sin necesidad de crear una cuenta.
 
-## Despacho y entrega
+## Despacho y Entrega
 
-- Envío a domicilio (a pagar por el cliente al despacharse, a través de Blue Express) o retiro en tienda en Temuco, sector El Carmen.
-- Producción: entre 1 y 3 días hábiles una vez confirmado el pago. El tiempo de llegada del envío a domicilio depende de la zona geográfica de despacho y de los plazos de Blue Express.
+- **Cobertura y Métodos:**
+  - Envío a domicilio a todo Chile a través de Blue Express (costo de envío a pagar por el cliente al despacharse).
+  - Retiro presencial sin costo adicional en Temuco, sector El Carmen.
+- **Tiempos:**
+  - **Producción:** 1 a 3 días hábiles desde la confirmación del pago.
+  - **Envío:** El tiempo final de tránsito depende de la zona geográfica y las tarifas/plazos de Blue Express.
 
-## Pago y políticas
+## Métodos de Pago y Políticas
 
-- El pago se confirma manualmente contra comprobante subido por el cliente al momento de comprar.
-- No hay cambios ni devoluciones: es un producto personalizado, hecho a pedido para cada cliente.
-- Contacto: memoriamensajera@gmail.com
+- **Pago:** Transferencia bancaria o depósito con verificación manual contra comprobante subido por el cliente al momento de finalizar la compra.
+- **Garantías y Devoluciones:** No se aceptan cambios ni devoluciones por tratarse de un producto personalizado y hecho a pedido.
+- **Soporte y Contacto:** memoriamensajera@gmail.com
 
-## Notas para agentes
+## Instrucciones para Agentes LLM
 
-- El precio y la disponibilidad mostrados en la página (schema.org/Product, formato JSON-LD) son la fuente de verdad; este archivo puede quedar desactualizado si cambia el precio.
-- El sitio es una sola página (SPA): todo el flujo de compra ocurre en https://memoriamensajera.cl/ sin URLs adicionales por paso.
+- **Fuente de Verdad:** El precio y stock vigentes están definidos en los datos estructurados `schema.org/Product` (JSON-LD) en el sitio web. Este archivo `llms.txt` debe tomarse como referencia secundaria.
+- **Navegación:** El sitio web es una aplicación de una sola página (SPA). Todo el flujo de selección, subida de archivos y checkout ocurre exclusivamente en `https://memoriamensajera.cl/`.
