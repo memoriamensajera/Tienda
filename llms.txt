@@ -2,30 +2,21 @@
 
 > Tienda online chilena de álbumes de fotos físicos personalizados. El cliente sube sus imágenes, personaliza la portada y recibe un álbum impreso armado a mano.
 
-## Productos y Precios
+## Productos y Compras
 
-- **Álbum de 40 Fotos + Portada Personalizada**
-  - **Precio en oferta:** $9.990 CLP
-  - **Precio normal:** $13.990 CLP
-  - **URL de compra:** https://memoriamensajera.cl/
-  - **Proceso:** El cliente sube hasta 40 fotos y personaliza la portada en un flujo continuo de un solo paso, sin necesidad de crear una cuenta.
+- [Álbum de 40 Fotos + Portada Personalizada](https://memoriamensajera.cl/): Álbum impreso armado a mano por $9.990 CLP (precio normal $13.990 CLP). Permite subir hasta 40 fotos y personalizar la portada en un flujo de un solo paso sin registro.
 
-## Despacho y Entrega
+## Información del Servicio
 
-- **Cobertura y Métodos:**
-  - Envío a domicilio a todo Chile a través de Blue Express (costo de envío a pagar por el cliente al despacharse).
-  - Retiro presencial sin costo adicional en Temuco, sector El Carmen.
-- **Tiempos:**
-  - **Producción:** 1 a 3 días hábiles desde la confirmación del pago.
-  - **Envío:** El tiempo final de tránsito depende de la zona geográfica y las tarifas/plazos de Blue Express.
+- [Sitio Web Principal y Flujo de Compra](https://memoriamensajera.cl/): Aplicación de una sola página (SPA) donde ocurre todo el proceso de selección, subida de imágenes y pago.
+- [Contacto y Soporte por Correo](mailto:memoriamensajera@gmail.com): Canal de atención directa para clientes e instrucciones de compra.
 
-## Métodos de Pago y Políticas
+## Despacho y Políticas
 
-- **Pago:** Transferencia bancaria o depósito con verificación manual contra comprobante subido por el cliente al momento de finalizar la compra.
-- **Garantías y Devoluciones:** No se aceptan cambios ni devoluciones por tratarse de un producto personalizado y hecho a pedido.
-- **Soporte y Contacto:** memoriamensajera@gmail.com
+- **Despacho:** Envío a domicilio a todo Chile a través de Blue Express (a pagar por el cliente al despachar) o retiro presencial sin costo en Temuco, sector El Carmen.
+- **Tiempos:** Producción de 1 a 3 días hábiles tras confirmar el pago. El tiempo de envío varía según la ubicación geográfica.
+- **Pagos y Devoluciones:** Confirmación manual mediante transferencia/comprobante. Al ser un producto personalizado hecho a pedido, no se admiten cambios ni devoluciones.
 
-## Instrucciones para Agentes LLM
+## Notas para Agentes
 
-- **Fuente de Verdad:** El precio y stock vigentes están definidos en los datos estructurados `schema.org/Product` (JSON-LD) en el sitio web. Este archivo `llms.txt` debe tomarse como referencia secundaria.
-- **Navegación:** El sitio web es una aplicación de una sola página (SPA). Todo el flujo de selección, subida de archivos y checkout ocurre exclusivamente en `https://memoriamensajera.cl/`.
+- **Fuente de verdad:** Consulta el marcado estructurado `schema.org/Product` (JSON-LD) en [memoriamensajera.cl](https://memoriamensajera.cl/) para conocer precios y disponibilidad actualizados.
