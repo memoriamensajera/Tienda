@@ -1599,6 +1599,7 @@
         cover = {
           id: 'cover-' + original.id,
           file: original.file,
+          master: original.master,
           source: original.source,
           autoRotate: original.autoRotate,
           userRotation: original.userRotation,
@@ -1957,7 +1958,7 @@
     loadSource(file, maxSide) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
+        reader.onerror = () => reject(new Error('No se pudo leer el archivo. Si la foto está en la nube o la moviste, vuelve a seleccionarla.'));
         reader.onload = () => {
           const img = new Image();
           img.onload = () => {
@@ -1992,6 +1993,33 @@
       return this.loadSource(file, MAX_EXPORT_SIDE);
     }
 
+    // Copia propia de la foto (JPEG, máx. 2000px): vive en memoria como Blob y no
+    // depende del archivo original de la galería.
+    canvasToMasterBlob(canvas) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(
+          (blob) => (blob ? resolve(blob) : reject(new Error('No se pudo preparar la foto'))),
+          'image/jpeg',
+          0.92
+        );
+      });
+    }
+
+    // Devuelve un canvas nuevo con el contenido reducido a maxSide como máximo.
+    shrinkCanvas(canvas, maxSide) {
+      const scale = Math.min(1, maxSide / Math.max(canvas.width, canvas.height));
+      const width = Math.max(1, Math.round(canvas.width * scale));
+      const height = Math.max(1, Math.round(canvas.height * scale));
+      const out = document.createElement('canvas');
+      out.width = width;
+      out.height = height;
+      const ctx = out.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(canvas, 0, 0, width, height);
+      return out;
+    }
+
     // Lee el archivo, detecta orientación y genera el primer recorte. Todo local, sin red.
     async processPhoto(photo) {
       this.runningCrops++;
@@ -1999,8 +2027,16 @@
         photo.status = 'cropping';
         this.updateThumb(photo);
 
-        const src = await this.loadSource(photo.file, MAX_SOURCE_SIDE);
-        photo.source = src.canvas;
+        // Se lee el archivo ORIGINAL una sola vez, ahora, mientras el navegador todavía
+        // tiene acceso a él (en Android el permiso sobre archivos de la galería puede
+        // expirar si el cliente cambia de app, p. ej. para hacer la transferencia).
+        // De esa lectura salen: una copia propia en memoria (master, 2000px) que se usa
+        // al comprar, y la copia liviana de 600px para editar.
+        const src = await this.loadSource(photo.file, MAX_EXPORT_SIDE);
+        photo.master = await this.canvasToMasterBlob(src.canvas);
+        photo.source = this.shrinkCanvas(src.canvas, MAX_SOURCE_SIDE);
+        src.canvas.width = 0;
+        src.canvas.height = 0;
 
         // Si la foto viene horizontal pero el recorte final es vertical (o viceversa),
         // la rotamos automáticamente 90° para aprovechar el encuadre óptimo.
@@ -2519,7 +2555,7 @@
     // comprar, una foto a la vez, y libera explícitamente los canvases pesados apenas
     // termina — así nunca hay más de un canvas de alta resolución vivo a la vez.
     async renderFinalBlob(photoLike) {
-      const highRes = await this.loadHighResSource(photoLike.file);
+      const highRes = await this.loadHighResSource(photoLike.master || photoLike.file);
       const { canvas: rotatedCanvas, width, height } = this.buildRotatedCanvas(photoLike, highRes.canvas);
       const blob = await this.cropCanvasToBlob(rotatedCanvas, width, height, photoLike.offsetX, photoLike.offsetY, photoLike.zoom);
 
@@ -2574,14 +2610,17 @@
       this.setUploadProgress(completed, total);
       if (onProgress) onProgress(completed, total);
 
-      for (const photo of items) {
+      for (let i = 0; i < items.length; i++) {
+        const photo = items[i];
         if (photo.status === 'done') continue;
+        const etiqueta = i === items.length - 1 ? 'la portada' : 'la foto ' + (i + 1);
 
         let attempt = 0;
+        let blob = null;
         for (;;) {
           attempt++;
           try {
-            const blob = await this.renderFinalBlob(photo);
+            if (!blob) blob = await this.renderFinalBlob(photo);
             photo.blob = blob;
             const url = await this.uploadToImgbb(blob);
             photo.url = url;
@@ -2591,7 +2630,10 @@
             if (onProgress) onProgress(completed, total);
             break;
           } catch (err) {
-            if (attempt > MAX_RETRIES) throw err;
+            if (attempt > MAX_RETRIES) {
+              throw new Error('Falló ' + etiqueta + ': ' + (err && err.message ? err.message : err));
+            }
+            await this.wait(700 * attempt);
           }
         }
       }
@@ -2723,6 +2765,7 @@
     qty: 1,
     comprobanteFile: null,
     comprobanteDataUrl: null,
+    comprobanteBlob: null,
     tipoEntrega: 'Envío a domicilio', // 'Retiro' | 'Envío a domicilio' | 'Envío a sucursal'
     costoEnvio: null,
   };
@@ -2919,6 +2962,7 @@
   function resetUploadBox() {
     state.comprobanteFile = null;
     state.comprobanteDataUrl = null;
+    state.comprobanteBlob = null;
     comprobanteInput.value = '';
     uploadBox.classList.remove('has-file');
     uploadPlaceholder.style.display = 'block';
@@ -2930,7 +2974,10 @@
     const file = comprobanteInput.files[0];
     if (!file) return;
     state.comprobanteFile = file;
+    state.comprobanteBlob = null;
     refrescarBotonPago();
+    // Se comprime ya, mientras el navegador aún puede leer el archivo de la galería.
+    comprimirComprobante(file).then((b) => { if (state.comprobanteFile === file) state.comprobanteBlob = b; }).catch(() => {});
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -3165,7 +3212,7 @@
       submitBtnText.textContent = 'Subiendo comprobante...';
       let comprobanteUrl;
       try {
-        const comprobanteComprimido = await comprimirComprobante(state.comprobanteFile);
+        const comprobanteComprimido = state.comprobanteBlob || (await comprimirComprobante(state.comprobanteFile));
         comprobanteUrl = await subirBlobAImgbb(comprobanteComprimido);
       } catch (err) {
         throw new Error('Al subir el comprobante de pago: ' + (err && err.message ? err.message : err));
