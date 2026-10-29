@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Pedido recibido! — Memoria Mensajera</title>
+<meta name="description" content="Confirmación de tu pedido en Memoria Mensajera.">
+<!-- Página privada de confirmación: que Google no la indexe. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<!-- Meta Pixel Code (el mismo que en index.html) -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1018330134644523');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1018330134644523&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue-deep:#3B62C4;
+    --blue-bg:#AEE0F9;
+    --ink:#242424;
+    --paper:#FBFAF7;
+    --line:#E1E4E0;
+    --success:#2F9E63;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block;}
+  a{color:inherit;}
+
+  .site-header{
+    padding:15px 20px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:center;
+  }
+  .logo{display:inline-block;}
+  .logo img{height:55px;width:auto;display:block;}
+
+  main{max-width:1120px;margin:0 auto;padding:0 20px;}
+
+  .confirm-wrap{max-width:520px;margin:0 auto;padding:90px 0;text-align:center;}
+  .confirm-icon{
+    width:64px;height:64px;border-radius:50%;background:var(--success);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    margin:0 auto 24px;
+  }
+  .confirm-title{font-family:'Instrument Serif',serif;font-size:36px;font-weight:400;margin:0 0 12px;}
+  .confirm-text{font-size:15px;color:#4A4A4A;line-height:1.6;margin:0 0 6px;}
+  .confirm-order{
+    display:inline-block;margin:22px 0;font-size:13px;letter-spacing:.4px;
+    background:#F3F2EC;padding:8px 16px;border-radius:99px;color:#5f5f5f;
+  }
+  .confirm-order strong{color:var(--ink);}
+  .confirm-next{
+    text-align:left;margin:10px auto 0;max-width:420px;
+    border-top:1px solid var(--line);padding-top:18px;
+  }
+  .confirm-next h2{font-size:13px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--blue-deep);margin:0 0 10px;}
+  .confirm-next ul{margin:0;padding-left:18px;font-size:14px;line-height:1.7;color:#4A4A4A;}
+  .confirm-back{
+    display:inline-block;margin-top:26px;font-size:14px;font-weight:600;
+    color:var(--blue-deep);text-decoration:underline;
+  }
+  .confirm-help{margin-top:22px;font-size:12.5px;color:#6b6b6b;}
+  .confirm-help a{color:var(--blue-deep);font-weight:600;}
+  [hidden]{display:none !important;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/" class="logo"><img src="assets/img/logo.png" alt="Memoria Mensajera" width="182" height="55"></a>
+</header>
+
+<main>
+  <div class="confirm-wrap">
+    <div class="confirm-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Con pedido válido -->
+    <div id="conPedido" hidden>
+      <h1 class="confirm-title">¡Pedido recibido!</h1>
+      <p class="confirm-text">Revisaremos tu comprobante y comenzaremos a preparar tu álbum.</p>
+      <p class="confirm-text">Te enviaremos la confirmación a <strong id="confirmEmail">tu correo</strong>.</p>
+      <div class="confirm-order">N.º de pedido <strong id="confirmOrderId">—</strong></div>
+
+      <div class="confirm-next">
+        <h2>Qué sigue</h2>
+        <ul>
+          <li>Verificamos tu transferencia a mano, así que puede tardar un poco.</li>
+          <li>Producción: de 1 a 3 días hábiles una vez confirmado el pago.</li>
+          <li>Te avisamos por correo en cada paso, hasta la entrega o el retiro.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sin pedido (entrada directa a /gracias) -->
+    <div id="sinPedido" hidden>
+      <h1 class="confirm-title">Esta página es para confirmar compras</h1>
+      <p class="confirm-text">No encontramos un pedido asociado a este enlace. Si acabas de comprar, revisa tu correo: ahí está la confirmación con tu número de pedido.</p>
+    </div>
+
+    <a class="confirm-back" href="/">Volver al inicio</a>
+    <p class="confirm-help">¿Dudas? Escríbenos a <a href="mailto:memoriamensajera@gmail.com">memoriamensajera@gmail.com</a></p>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // El N.º de pedido llega en la URL (?pedido=260925-0050-7). Solo se acepta si tiene
+  // ese formato exacto, así nadie puede meter texto raro en la página.
+  var FORMATO_PEDIDO = /^\d{6}-\d{4}-\d$/;
+  var params = new URLSearchParams(window.location.search);
+  var pedido = params.get('pedido') || '';
+  var valido = FORMATO_PEDIDO.test(pedido);
+
+  // Datos que dejó index.html en esta pestaña (correo y total no van en la URL).
+  var datos = null;
+  try {
+    var crudo = sessionStorage.getItem('mm_pedido');
+    if (crudo) {
+      var parsed = JSON.parse(crudo);
+      if (parsed && parsed.pedido === pedido) datos = parsed;
+    }
+  } catch (e) {}
+
+  if (!valido) {
+    document.getElementById('sinPedido').hidden = false;
+    return; // sin pedido válido NO se registra ninguna compra
+  }
+
+  document.getElementById('conPedido').hidden = false;
+  document.getElementById('confirmOrderId').textContent = pedido;
+  if (datos && datos.correo) {
+    document.getElementById('confirmEmail').textContent = datos.correo;
+  }
+
+  // ---- Evento "Purchase" del Meta Pixel ----
+  // Solo si venimos de una compra real (hay datos de esta pestaña) y solo una vez por
+  // pedido: si el cliente recarga la página, no se cuenta otra venta.
+  if (!datos || typeof window.fbq !== 'function') return;
+
+  var CLAVE = 'mm_purchase_tracked';
+  var yaContados = [];
+  try { yaContados = JSON.parse(localStorage.getItem(CLAVE) || '[]'); } catch (e) {}
+  if (yaContados.indexOf(pedido) !== -1) return;
+
+  var total = Number(datos.total);
+  if (!isFinite(total) || total <= 0) return;
+
+  // eventID = N.º de pedido: Meta lo usa para no duplicar si algún día se envía
+  // también desde el servidor.
+  window.fbq('track', 'Purchase', {
+    value: total,
+    currency: 'CLP',
+    num_items: Number(datos.cantidad) || 1,
+    content_type: 'product',
+    content_name: 'Álbum de 40 Fotos + Portada Personalizada'
+  }, { eventID: pedido });
+
+  yaContados.push(pedido);
+  try { localStorage.setItem(CLAVE, JSON.stringify(yaContados.slice(-50))); } catch (e) {}
+})();
+</script>
+
+</body>
+</html>

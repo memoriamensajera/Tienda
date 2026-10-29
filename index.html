@@ -488,27 +488,6 @@
   }
   .album-wizard{margin:0;} /* el wizard trae su propio max-width:511px */
 
-  /* ---------- confirmación ---------- */
-  .confirm-wrap{
-    max-width:520px;margin:0 auto;padding:90px 0;text-align:center;
-  }
-  .confirm-icon{
-    width:64px;height:64px;border-radius:50%;background:var(--success);
-    color:#fff;display:flex;align-items:center;justify-content:center;
-    margin:0 auto 24px;
-  }
-  .confirm-title{font-family:'Instrument Serif',serif;font-size:36px;margin:0 0 12px;}
-  .confirm-text{font-size:15px;color:#4A4A4A;line-height:1.6;margin:0 0 6px;}
-  .confirm-order{
-    display:inline-block;margin:22px 0;font-size:13px;letter-spacing:.4px;
-    background:#F3F2EC;padding:8px 16px;border-radius:99px;color:#6b6b6b;
-  }
-  .confirm-order strong{color:var(--ink);}
-  .confirm-back{
-    display:inline-block;margin-top:14px;font-size:14px;font-weight:600;
-    color:var(--blue-deep);cursor:pointer;text-decoration:underline;background:none;border:none;
-  }
-
   /* =====================================================================
      Estilos del wizard de álbum de fotos (album-fotos.css, sin cambios)
      ===================================================================== */
@@ -1303,21 +1282,6 @@
           Si tienes algún problema, escríbenos a: <a href="mailto:memoriamensajera@gmail.com">memoriamensajera@gmail.com</a>
         </p>
       </form>
-    </div>
-  </section>
-
-  <!-- ============ PANTALLA 3: CONFIRMACIÓN ============ -->
-  <section class="screen" id="screen-confirm">
-    <div class="confirm-wrap">
-      <div class="confirm-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <h2 class="confirm-title">¡Pedido recibido!</h2>
-      <p class="confirm-text">Revisaremos tu comprobante y comenzaremos a preparar tu álbum.</p>
-      <p class="confirm-text">Te enviaremos la confirmación a <strong id="confirmEmail">tu@correo.com</strong>.</p>
-      <div class="confirm-order">N.º de pedido <strong id="confirmOrderId">#000000</strong></div>
-      <br>
-      <button class="confirm-back" id="confirmBack">Volver al inicio</button>
     </div>
   </section>
 
@@ -2823,7 +2787,6 @@
   const screens = {
     product: document.getElementById('screen-product'),
     checkout: document.getElementById('screen-checkout'),
-    confirm: document.getElementById('screen-confirm'),
   };
 
   function showScreen(name) {
@@ -2950,10 +2913,16 @@
     e.preventDefault();
     showScreen('product');
   });
-  document.getElementById('confirmBack').addEventListener('click', () => {
-    document.getElementById('checkoutForm').reset();
-    resetUploadBox();
-    showScreen('product');
+  // Si el cliente vuelve con "atrás" desde la página de confirmación, el navegador
+  // puede restaurar esta página con el formulario aún lleno (y dejar pagar dos veces).
+  // Como ya compró, se recarga limpia.
+  window.addEventListener('pageshow', (ev) => {
+    let comprado = false;
+    try { comprado = sessionStorage.getItem('mm_compra_enviada') === '1'; } catch (e) {}
+    if (comprado && ev.persisted) {
+      try { sessionStorage.removeItem('mm_compra_enviada'); } catch (e) {}
+      window.location.reload();
+    }
   });
 
   /* ---------------------- comprobante de pago ---------------------- */
@@ -3280,15 +3249,22 @@
       }
       if (!resultado.ok) throw new Error('Al registrar el pedido en el Sheet: ' + (resultado.error || 'error desconocido'));
 
-      document.getElementById('confirmOrderId').textContent = resultado.numPedido;
-      document.getElementById('confirmEmail').textContent = correo;
+      // Compra lista: se pasan los datos a la página /gracias (el correo y el total
+      // viajan por sessionStorage, no por la URL; en la URL va solo el N.º de pedido).
+      try {
+        sessionStorage.setItem('mm_pedido', JSON.stringify({
+          pedido: resultado.numPedido,
+          correo: correo,
+          total: subtotalProductos,
+          cantidad: state.qty,
+        }));
+        sessionStorage.setItem('mm_compra_enviada', '1');
+      } catch (e) { /* sin sessionStorage la página igual muestra el N.º de pedido */ }
 
-      state.enviando = false;
-      refrescarBotonPago();
-      submitBtn.classList.remove('is-loading');
-      submitBtnText.textContent = 'Pagar ahora';
-
-      showScreen('confirm');
+      // El botón queda bloqueado mientras se cambia de página (evita doble clic).
+      submitBtnText.textContent = 'Pedido enviado...';
+      window.location.href = 'gracias?pedido=' + encodeURIComponent(resultado.numPedido);
+      return;
     } catch (err) {
       console.error('Error al enviar el pedido:', err && err.message ? err.message : err);
       checkoutProgressRow.hidden = true;
