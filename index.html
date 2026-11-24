@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CL">
 <head>  
 
   <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-P8CBHQJ2"></script>
@@ -34,8 +34,9 @@
   <!-- fin de Verificacion de dominio -->
   
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Álbum de 40 Fotos + Portada Personalizada</title>
-<meta name="description" content="Álbum de fotos personalizado de 40 fotos con portada a tu gusto. Envío a domicilio o retiro en Temuco. Pídelo en minutos, sube tus fotos y arma tu recuerdo.">
+<title>Álbum de Fotos Personalizado de 40 Fotos con Portada | Memoria Mensajera</title>
+<meta name="description" content="Álbum de fotos personalizado de 40 fotos con portada a tu gusto. Imprime las fotos de tu celular y regálalas: envío a todo Chile o retiro en Temuco. Desde $9.990.">
+<link rel="canonical" href="https://memoriamensajera.cl/">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -44,7 +45,7 @@
   "@context": "https://schema.org",
   "@type": "Product",
   "name": "Álbum de 40 Fotos + Portada Personalizada",
-  "description": "Álbum de fotos personalizado de 40 fotos con portada a tu gusto, ideal para regalos y recuerdos compartidos.",
+  "description": "Álbum de fotos personalizado de 40 fotos con portada a tu gusto. Convierte las fotos de tu celular en un álbum impreso, ideal como regalo personalizado con fotos.",
   "image": "https://memoriamensajera.cl/assets/img/album-1.webp",
   "brand": {
     "@type": "Brand",
@@ -115,34 +116,21 @@
     padding-bottom:10px;
   }
 
-  /* Escritorio/tablet: en vez de position:sticky (se bugueaba en mobile),
-     la columna de la izquierda queda de altura fija y es la de la derecha
-     la que scrollea adentro suyo, de forma independiente del resto de la
-     página. Nada de esto se activa en mobile: ahí es un solo scroll normal
-     de la página completa, como cualquier sitio. */
+  /* Escritorio/tablet: la galería de la izquierda queda fija (sticky) mientras
+     se baja por la columna de la derecha; así las fotos siempre se ven.
+     Ya no hay altura fija ni scroll interno: es un solo scroll de página.
+     Ojo: ningún ancestro de .gallery puede tener overflow (rompe el sticky).
+     En mobile no se activa: una sola columna, scroll normal. */
   @media (min-width:861px){
-    .product{
-      height:calc(100vh - 86px); /* 86px = alto real del header (15+55+15+1 borde) */
-    }
+    .product{padding-bottom:8px;}
     .gallery{
-      height:100%;
-      display:flex;
-      flex-direction:column;
+      position:sticky;
+      top:24px;
+      align-self:start;
     }
     .gallery-main{
-      flex:1;
-      min-height:0;
-      aspect-ratio:auto;
-    }
-    .product-info{
-      height:100%;
-      overflow-y:auto;
-      /* scrollea igual, pero sin mostrar la barra */
-      scrollbar-width:none;      /* Firefox */
-      -ms-overflow-style:none;   /* Edge/IE viejos */
-    }
-    .product-info::-webkit-scrollbar{
-      display:none; /* Chrome, Safari, Edge nuevo */
+      /* foto + miniaturas siempre caben en pantalla */
+      max-height:calc(100vh - 150px);
     }
   }
 
@@ -186,7 +174,28 @@
     margin:0 0 14px;
     color:var(--ink);
   }
-  .price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:22px;}
+  .price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:10px;}
+  /* indicador de stock con punto pulsante */
+  .stock-row{display:flex;align-items:center;gap:9px;margin:0 0 22px;font-size:13.5px;font-weight:600;color:var(--success);}
+  .stock-dot{position:relative;width:9px;height:9px;border-radius:50%;background:var(--success);flex:none;}
+  .stock-dot::after{
+    content:"";position:absolute;inset:0;border-radius:50%;background:var(--success);
+    animation:stockPulse 1.8s ease-out infinite;
+  }
+  @keyframes stockPulse{0%{transform:scale(1);opacity:.55;}80%,100%{transform:scale(3.2);opacity:0;}}
+  @media (prefers-reduced-motion:reduce){.stock-dot::after{animation:none;}}
+  /* aviso de plazo de entrega */
+  .ship-note{
+    display:flex;align-items:center;gap:12px;
+    border:1px solid #43a193;background:rgb(239 250 253);color:#07695c;
+    border-radius:9px;padding:12px 14px;margin:0 0 22px;
+  }
+  .ship-note-icon{
+    flex:none;width:38px;height:38px;border-radius:50%;
+    background:#07695c;color:#fff;display:flex;align-items:center;justify-content:center;
+  }
+  .ship-note-icon svg{width:20px;height:20px;}
+  .ship-note p{margin:0;font-size:14px;line-height:1.45;color:#07695c;}
   .price-final{font-size:26px;font-weight:700;color:var(--blue-deep);}
   .price-prev{font-size:16px;color:#6b6b6b;text-decoration:line-through;}
   .price-badge{
@@ -898,6 +907,242 @@
 }
 @keyframes album-pop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
 
+
+  /* =====================================================================
+     Sección: cómo imprimir fotos del celular (acordeón)
+     ===================================================================== */
+  .howto{
+    margin:64px 0 0;
+    background:#fff;
+    border:1px solid var(--blue-bg);
+    border-radius:9px;
+    overflow:hidden;
+  }
+  .howto-title{margin:0;font:inherit;}
+  .howto-head{
+    all:unset;box-sizing:border-box;
+    width:100%;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    padding:26px 32px;
+    transition:background .25s ease;
+  }
+  .howto-head:hover{background:#F5FAFE;}
+  .howto-head:focus-visible{outline:2px solid var(--blue-deep);outline-offset:-4px;border-radius:9px;}
+  .howto-head-text{display:block;min-width:0;}
+  .howto-kicker{
+    display:block;font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    color:#00a18c;margin:0 0 6px;
+  }
+  .howto-title-text{
+    display:block;
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:38px;line-height:1.08;color:#1c3f91;font-style:italic;
+  }
+  .howto-title-text .t-mobile{display:none;}
+  .howto-toggle{
+    flex:none;width:44px;height:44px;border-radius:9px;
+    background:rgb(218 239 255);color:var(--blue-deep);
+    display:flex;align-items:center;justify-content:center;
+    transition:background .25s ease,color .25s ease;
+  }
+  .howto-toggle svg{width:20px;height:20px;transition:transform .5s cubic-bezier(.22,1,.36,1);}
+  .howto-head:hover .howto-toggle{background:var(--blue-bg);}
+  .howto.is-open .howto-toggle{background:var(--blue-deep);color:#fff;}
+  .howto.is-open .howto-toggle svg{transform:rotate(135deg);}
+
+  /* panel: anima la altura real (0fr -> 1fr) sin medir nada con JS */
+  .howto-panel{
+    display:grid;grid-template-rows:0fr;
+    transition:grid-template-rows .55s cubic-bezier(.22,1,.36,1);
+  }
+  .howto.is-open .howto-panel{grid-template-rows:1fr;}
+  .howto-panel-inner{
+    min-height:0;overflow:hidden;
+    visibility:hidden;
+    transition:visibility 0s linear .55s;
+  }
+  .howto.is-open .howto-panel-inner{visibility:visible;transition-delay:0s;}
+  .howto-content{
+    display:grid;
+    grid-template-columns:minmax(0,340px) minmax(0,1fr);
+    gap:48px;align-items:center;
+    padding:6px 32px 36px;
+  }
+  .howto-video{grid-column:1;grid-row:1;min-width:0;}
+  .howto-body{grid-column:2;grid-row:1;min-width:0;}
+  /* video tutorial: portada (facade) que al click carga YouTube o <video>.
+     Proporción Full HD vertical (1080x1920 = 9:16). */
+  .video-box{
+    position:relative;aspect-ratio:9/16;
+    border-radius:9px;overflow:hidden;
+    background:rgb(218 239 255);border:1px solid var(--blue-bg);
+  }
+  .video-facade{all:unset;box-sizing:border-box;position:absolute;inset:0;display:block;cursor:pointer;overflow:hidden;}
+  .video-facade video{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;object-fit:cover;background:#000;transition:transform .7s cubic-bezier(.22,1,.36,1);}
+  .video-facade::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(to top,rgba(28,63,145,.5),rgba(28,63,145,0) 55%);
+  }
+  .video-play{
+    position:absolute;left:50%;top:50%;width:70px;height:70px;margin:-35px 0 0 -35px;z-index:1;
+    border-radius:50%;background:#fff;color:var(--blue-deep);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 24px rgba(28,63,145,.28);
+    transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .25s ease;
+  }
+  .video-play svg{width:28px;height:28px;margin-left:3px;}
+  .video-label{
+    position:absolute;left:12px;right:12px;bottom:16px;z-index:1;
+    color:#fff;font-weight:700;font-size:14.5px;text-align:center;
+  }
+  .video-facade[hidden]{display:none;}  /* all:unset anulaba el atributo hidden */
+  .video-facade:hover video{transform:scale(1.05);}
+  .video-facade:hover .video-play{transform:scale(1.1);}
+  .video-facade:focus-visible{outline:3px solid var(--blue-deep);outline-offset:-3px;}
+  .video-box iframe,.video-box video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;}
+  .video-box video{object-fit:cover;}
+  /* una vez iniciado: el botón queda como capa transparente sobre el video (click = pausa/play);
+     el play grande solo aparece cuando el video está en pausa o terminó */
+  .video-box.is-started .video-facade video,
+  .video-box.is-started .video-label{opacity:0;visibility:hidden;}
+  .video-box.is-started .video-facade::after{opacity:0;}
+  /* deja libre la franja inferior para que se pueda usar la barra de controles nativa (adelantar / retroceder) */
+  .video-box.is-started .video-facade{z-index:2;bottom:64px;}
+  .video-box.is-started .video-play{top:calc(50% + 32px);}
+  .video-box.is-started.is-playing .video-play{opacity:0;transform:scale(.6);pointer-events:none;}
+  .video-box.is-started .video-facade:hover video{transform:none;}
+  .video-soon{margin:10px 0 0;font-size:13px;font-weight:600;color:var(--blue-deep);text-align:center;}
+  #album-wizard-main{scroll-margin-top:24px;}
+  .howto-intro{font-size:15.5px;line-height:1.6;color:#4A4A4A;margin:0 0 22px;max-width:54ch;}
+  .howto-steps{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:10px;counter-reset:paso;}
+  .howto-steps li{
+    counter-increment:paso;
+    display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:center;
+    background:rgb(218 239 255);border-radius:9px;padding:14px 16px;
+  }
+  .howto-steps li::before{
+    content:counter(paso);
+    width:40px;height:40px;border-radius:9px;
+    background:#fff;color:#db6f56;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:17px;
+  }
+  .howto-steps h3{margin:0 0 3px;font-size:16px;font-weight:700;color:#1c3f91;}
+  .howto-steps p{margin:0;font-size:14px;line-height:1.55;color:#3b62c4;}
+  .howto-gift{font-size:14px;line-height:1.55;color:#4A4A4A;margin:0 0 22px;}
+  /* botón lineal: fondo blanco, borde y letras azules, con flecha */
+  .howto-cta{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    height:50px;padding:0 26px;border-radius:9px;
+    background:#fff;color:var(--blue-deep);
+    border:1.5px solid var(--blue-deep);
+    text-decoration:none;font-weight:700;font-size:15.5px;
+  }
+  .howto-cta svg{width:18px;height:18px;transition:transform .25s ease;}
+  .howto-cta:hover{background:var(--blue-deep);color:#fff;}
+  .howto-cta:hover svg{transform:translateX(4px);}
+
+  /* entrada escalonada del contenido al abrir */
+  .howto-video,.howto-intro,.howto-steps li,.howto-gift,{
+    opacity:0;transform:translateY(14px);
+    transition:opacity .35s ease,transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .howto.is-open .howto-video,
+  .howto.is-open .howto-intro,
+  .howto.is-open .howto-steps li,
+  .howto.is-open .howto-gift{
+    opacity:1;transform:none;
+    transition-delay:calc(120ms + var(--i,0) * 70ms);
+  }
+  /* el botón anima su entrada, pero el hover no debe heredar ese retraso */
+  .howto-cta{
+    opacity:0;transform:translateY(14px);
+    transition:opacity .35s ease,transform .45s cubic-bezier(.22,1,.36,1),background .2s ease,color .2s ease;
+  }
+  .howto.is-open .howto-cta{
+    opacity:1;transform:none;
+    transition-delay:calc(120ms + var(--i,0) * 70ms),calc(120ms + var(--i,0) * 70ms),0s,0s;
+  }
+
+  @media (max-width:860px){
+    .howto{margin-top:48px;}
+    .howto-head{padding:20px 18px;gap:14px;}
+    .howto-toggle{width:40px;height:40px;}
+    .howto-title-text .t-desktop{display:none;}
+    .howto-title-text .t-mobile{display:inline;}
+    .howto-content{grid-template-columns:minmax(0,1fr);gap:24px;padding:4px 16px 24px;}
+    /* en celular el video va arriba del texto */
+    .howto-video{grid-column:1;grid-row:1;width:100%;max-width:300px;justify-self:center;}
+    .howto-body{grid-column:1;grid-row:2;}
+    .howto-cta{width:100%;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .howto-panel,.howto-panel-inner,.howto-toggle,.howto-toggle svg,
+    .howto-video,.howto-intro,.howto-steps li,.howto-gift,.howto-cta{transition:none !important;}
+  }
+
+  /* =====================================================================
+     Sección: reseñas
+     ===================================================================== */
+  .reviews{margin:72px 0 0;}
+  .reviews-head{text-align:center;max-width:640px;margin:0 auto 32px;}
+  .reviews-title{
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:clamp(40px,6vw,64px);line-height:1.1;margin:0 0 10px;
+  }
+  .reviews-sub{font-size:15px;line-height:1.6;color:#4A4A4A;margin:0;}
+  .reviews-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;}
+  .review-card{
+    background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    display:flex;flex-direction:column;margin:0;
+  }
+  .review-photo{aspect-ratio:4/5;width:100%;height:auto;object-fit:cover;background:#EFEDE6;}
+  .review-body{padding:14px 16px 18px;}
+  .review-name{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;margin:0;}
+  .review-name svg{width:15px;height:15px;flex:none;color:var(--blue-deep);}
+  .review-date{font-size:12px;color:#6b6b6b;margin:4px 0 8px;}
+  .review-stars{color:#F2A81D;font-size:17px;letter-spacing:2px;margin:0 0 10px;line-height:1;}
+  .review-text{font-size:14px;line-height:1.55;color:#333;margin:0;}
+
+  @media (max-width:860px){
+    .reviews{margin-top:56px;}
+    .reviews-grid{
+      display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+      margin:0 -20px;padding:0 20px 14px;scroll-padding:0 20px;
+      scrollbar-width:thin;
+    }
+    .review-card{flex:0 0 72%;max-width:300px;scroll-snap-align:start;}
+  }
+
+  /* =====================================================================
+     Footer
+     ===================================================================== */
+  .site-footer{margin:80px 0 0;border-top:1px solid var(--line);padding:44px 0 28px;}
+  .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;}
+  .footer-brand img{height:55px;width:auto;margin-bottom:14px;}
+  .footer-brand p{font-size:14px;line-height:1.6;color:#4A4A4A;margin:0 0 16px;max-width:36ch;}
+  .footer-social{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .footer-social a{
+    width:40px;height:40px;border-radius:50%;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;color:var(--ink);
+    transition:background .15s,color .15s;
+  }
+  .footer-social a:hover{background:var(--blue-deep);border-color:var(--blue-deep);color:#fff;}
+  .footer-social svg{width:19px;height:19px;}
+  .footer-soon{
+    font-size:12px;font-weight:600;color:#6b6b6b;border:1px dashed #b9bdb8;
+    border-radius:99px;padding:6px 12px;
+  }
+  .footer-col h3{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin:0 0 14px;color:var(--blue-deep);}
+  .footer-col ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;}
+  .footer-col a{font-size:14.5px;text-decoration:none;color:#3a3a3a;}
+  .footer-col a:hover{color:var(--blue-deep);text-decoration:underline;}
+  .footer-copy{margin:36px 0 0;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:#6b6b6b;text-align:center;}
+
+  @media (max-width:860px){
+    .site-footer{margin-top:60px;padding-top:36px;}
+    .footer-grid{grid-template-columns:1fr;gap:30px;}
+  }
 </style>
 </head>
 <body>
@@ -913,7 +1158,7 @@
     <div class="product">
       <div class="gallery">
         <div class="gallery-main">
-          <img id="galleryMainImg" src="assets/img/album-1.webp" alt="Álbum de fotos personalizado" fetchpriority="high">
+          <img id="galleryMainImg" src="assets/img/album-1.webp" alt="Álbum de fotos personalizado de 40 fotos con portada personalizada" fetchpriority="high">
         </div>
         <div class="gallery-thumbs" id="galleryThumbs"></div>
       </div>
@@ -926,6 +1171,7 @@
           <span class="price-prev" id="pricePrev">$13.990</span>
           <span class="price-badge" id="priceBadge">OFF</span>
         </div>
+        <div class="stock-row"><span class="stock-dot" aria-hidden="true"></span>En stock</div>
 
         <p class="product-desc">
           No pierdas tus recuerdos entre las miles de fotos en tu celular,
@@ -942,9 +1188,10 @@
           </div>
         </div>
 
-        <p class="form-note" style="text-align:left;margin:-10px 0 22px;">
-          Ideal para regalos y recuerdos compartidos. Si compras más de 1 copia, se imprime el mismo álbum que armes abajo.
-        </p>
+        <div class="ship-note">
+          <span class="ship-note-icon"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.732 11h5.536a2 2 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456M12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/></svg></span>
+          <p>Si compras hoy, tu álbum estará listo de <strong>1 a 2 días hábiles</strong> después de confirmar el pago.</p>
+        </div>
 
         <details class="spec">
           <summary>Ficha técnica</summary>
@@ -1101,6 +1348,153 @@
       </div>
       </div>
     </div>
+
+    <!-- ============ SECCIÓN: CÓMO IMPRIMIR TUS FOTOS (acordeón) ============ -->
+    <section class="howto" id="como-imprimir">
+      <h2 class="howto-title">
+        <button type="button" class="howto-head" id="howtoHead" aria-expanded="false" aria-controls="howtoPanel">
+          <span class="howto-head-text">
+            <span class="howto-kicker">Álbum de fotos personalizado en 4 pasos</span>
+            <span class="howto-title-text"><span class="t-desktop">¿Cómo imprimir tus fotos?</span><span class="t-mobile">¿Cómo imprimir fotos del celular?</span></span>
+          </span>
+          <span class="howto-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+      </h2>
+      <div class="howto-panel" id="howtoPanel" role="region" aria-labelledby="howtoHead">
+        <div class="howto-panel-inner">
+          <div class="howto-content">
+            <div class="howto-video" id="howtoVideo" style="--i:0"
+                 data-youtube-id=""
+                 data-mp4="assets/img/video.mp4"
+                 data-webm=""
+                 data-poster="">
+              <!-- Video propio: assets/img/video.mp4. La portada es el primer frame del mismo video. -->
+              <div class="video-box">
+                <button type="button" class="video-facade" id="videoFacade" aria-label="Reproducir video tutorial: cómo imprimir tus fotos">
+                  <video class="video-preview" src="assets/img/video.mp4#t=0.001" preload="metadata" muted playsinline tabindex="-1" aria-hidden="true"></video>
+                  <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 001.5.86l10.5-6.5a1 1 0 000-1.72L9.5 4.64A1 1 0 008 5.5z"/></svg></span>
+                  <span class="video-label">Ver video tutorial</span>
+                </button>
+              </div>
+              <p class="video-soon" id="videoSoon" role="status" hidden>Video próximamente</p>
+            </div>
+            <div class="howto-body">
+              <p class="howto-intro" style="--i:1">
+                Imprimir tus fotos es más simple de lo que crees: sin chatear, sin filas y sin que tus
+                recuerdos queden perdidos en la galería. Así armas tu álbum de 40 fotos.
+              </p>
+              <ol class="howto-steps">
+                <li style="--i:2">
+                  <div>
+                    <h3>Reúne tus fotos</h3>
+                    <p>Elige tus recuerdos favoritos de la galería de tu celular o elígelas desde tu computador.</p>
+                  </div>
+                </li>
+                <li style="--i:3">
+                  <div>
+                    <h3>Sube y selecciona tus 40 fotos</h3>
+                    <p>Súbelas directo desde tu teléfono o computador y escoge las 40 que van en tu álbum. Una vez subidas, haz click en continuar.</p>
+                  </div>
+                </li>
+                <li style="--i:4">
+                  <div>
+                    <h3>Elige una portada</h3>
+                    <p>Selecciona cuál de todas las fotos subidas será tu portada.</p>
+                  </div>
+                </li>
+                <li style="--i:5">
+                  <div>
+                    <h3>¡Listo, ya tienes tu álbum!</h3>
+                    <p>Solo falta completar tus datos de envío y pagar. Nosotros lo armamos a mano y te lo enviamos.</p>
+                  </div>
+                </li>
+              </ol>
+              <p class="howto-gift" style="--i:6">
+                ¿Prefieres verlo en acción? Mira el video tutorial y descubre el paso a paso para armar tu álbum.
+              </p>
+              <a class="howto-cta" style="--i:7" href="#album-wizard-main">Armar mi álbum <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECCIÓN: RESEÑAS ============ -->
+    <section class="reviews" aria-labelledby="reviewsTitle">
+      <div class="reviews-head">
+        <h2 class="reviews-title" id="reviewsTitle">Ellos Ya Armaron Su Álbum</h2>
+        <p class="reviews-sub">Un regalo con fotos para tu pareja, tu mamá o para ti.</p>
+      </div>
+      <div class="reviews-grid">
+        <figure class="review-card">
+          <img class="review-photo" src="assets/img/review1.webp" alt="Álbum de fotos personalizado de Camila" width="900" height="1125" loading="lazy">
+          <figcaption class="review-body">
+            <p class="review-name">Camila <svg viewBox="0 0 24 24" fill="currentColor" aria-label="Compra verificada" role="img"><path d="M12 2l2.4 1.9 3-.3 1.2 2.8 2.7 1.4-.6 3 1.4 2.6-2 2.3.1 3.1-3 .8-1.6 2.6-2.9-1.1L9.1 22l-1.6-2.6-3-.8.1-3.1-2-2.3 1.4-2.6-.6-3L5.1 6.4l1.2-2.8 3 .3L12 2z" opacity=".0"/><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+            <p class="review-date">12/11/2026</p>
+            <p class="review-stars" role="img" aria-label="5 de 5 estrellas">★★★★★</p>
+            <p class="review-text">Siempre saco fotitos cuando viajo pero tener como un resumen de un viaje en un álbum físico es otra cosa 😍</p>
+          </figcaption>
+        </figure>
+        <figure class="review-card">
+          <img class="review-photo" src="assets/img/review2.webp" alt="Álbum de fotos personalizado de Matías S." width="900" height="1125" loading="lazy">
+          <figcaption class="review-body">
+            <p class="review-name">Matías S. <svg viewBox="0 0 24 24" fill="currentColor" aria-label="Compra verificada" role="img"><path d="M12 2l2.4 1.9 3-.3 1.2 2.8 2.7 1.4-.6 3 1.4 2.6-2 2.3.1 3.1-3 .8-1.6 2.6-2.9-1.1L9.1 22l-1.6-2.6-3-.8.1-3.1-2-2.3 1.4-2.6-.6-3L5.1 6.4l1.2-2.8 3 .3L12 2z" opacity=".0"/><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+            <p class="review-date">03/11/2026</p>
+            <p class="review-stars" role="img" aria-label="5 de 5 estrellas">★★★★★</p>
+            <p class="review-text">Mi Polola quedó super feliz, fue un regalo de aniversario. Me gustó harto, no había imprimido mis fotos antes, es posible que haga varios más.</p>
+          </figcaption>
+        </figure>
+        <figure class="review-card">
+          <img class="review-photo" src="assets/img/review3.webp" alt="Álbum de fotos personalizado de Felipe M." width="900" height="1125" loading="lazy">
+          <figcaption class="review-body">
+            <p class="review-name">Felipe M. <svg viewBox="0 0 24 24" fill="currentColor" aria-label="Compra verificada" role="img"><path d="M12 2l2.4 1.9 3-.3 1.2 2.8 2.7 1.4-.6 3 1.4 2.6-2 2.3.1 3.1-3 .8-1.6 2.6-2.9-1.1L9.1 22l-1.6-2.6-3-.8.1-3.1-2-2.3 1.4-2.6-.6-3L5.1 6.4l1.2-2.8 3 .3L12 2z" opacity=".0"/><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+            <p class="review-date">28/10/2026</p>
+            <p class="review-stars" role="img" aria-label="5 de 5 estrellas">★★★★★</p>
+            <p class="review-text">Si gracias, llegó super bien el álbum (...) lo recomendaría porque se puede hacer en un ratito y es un lindo gesto, este era un regalo para mi viejo.</p>
+          </figcaption>
+        </figure>
+        <figure class="review-card">
+          <img class="review-photo" src="assets/img/review4.webp" alt="Álbum de fotos personalizado de Javier" width="900" height="1125" loading="lazy">
+          <figcaption class="review-body">
+            <p class="review-name">Javier <svg viewBox="0 0 24 24" fill="currentColor" aria-label="Compra verificada" role="img"><path d="M12 2l2.4 1.9 3-.3 1.2 2.8 2.7 1.4-.6 3 1.4 2.6-2 2.3.1 3.1-3 .8-1.6 2.6-2.9-1.1L9.1 22l-1.6-2.6-3-.8.1-3.1-2-2.3 1.4-2.6-.6-3L5.1 6.4l1.2-2.8 3 .3L12 2z" opacity=".0"/><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+            <p class="review-date">15/10/2026</p>
+            <p class="review-stars" role="img" aria-label="5 de 5 estrellas">★★★★★</p>
+            <p class="review-text">Mi mamá ama sacar fotos, tiene lleno el celular jajaja, así que para su cumple le regalé el álbum, quedó super feliz, gracias.</p>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/img/logo.png" alt="Memoria Mensajera" width="182" height="55" loading="lazy">
+          <p>Álbumes de fotos personalizados, armados a mano. Envío a todo Chile.</p>
+          <div class="footer-social">
+            <a href="https://www.instagram.com/memoriamensajera" target="_blank" rel="noopener" aria-label="Instagram de Memoria Mensajera"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/></svg></a>
+            <a href="https://www.facebook.com/people/Memoria-Mensajera/61595749122579/" target="_blank" rel="noopener" aria-label="Facebook de Memoria Mensajera"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"/></svg></a>
+            <a href="https://www.tiktok.com/@memoriamensajera" target="_blank" rel="noopener" aria-label="TikTok de Memoria Mensajera"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z"/></svg></a>
+          </div>
+        </div>
+        <nav class="footer-col" aria-label="Ayuda">
+          <h3>Ayuda</h3>
+          <ul>
+            <li><a href="#como-imprimir">Cómo funciona</a></li>
+            <li><a href="preguntas-frecuentes.html">Preguntas frecuentes</a></li>
+            <li><a href="como-imprimir-fotos-del-celular.html">Cómo imprimir las fotos de tu celular</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-label="Regalos">
+          <h3>Regalos</h3>
+          <ul>
+            <li><a href="regalo-para-mama-con-fotos.html">Regalo para mamá con fotos</a></li>
+            <li><a href="regalo-aniversario-pareja-con-fotos.html">Regalo de aniversario con fotos</a></li>
+          </ul>
+        </nav>
+      </div>
+      <p class="footer-copy">© 2026 Memoria Mensajera · Chile</p>
+    </footer>
   </section>
 
   <!-- ============ PANTALLA 2: CHECKOUT ============ -->
@@ -2817,7 +3211,7 @@
       const btn = document.createElement('button');
       btn.className = i === 0 ? 'is-active' : '';
       btn.setAttribute('aria-label', 'Ver foto ' + (i + 1) + ' del álbum');
-      btn.innerHTML = '<img src="' + src + '" alt="" loading="lazy">';
+      btn.innerHTML = '<img src="' + src + '" alt="Álbum de 40 fotos personalizado, vista ' + (i + 1) + '" loading="lazy">';
       btn.addEventListener('click', () => {
         galleryMainImg.src = src;
         galleryThumbs.querySelectorAll('button').forEach((b) => b.classList.remove('is-active'));
@@ -3293,5 +3687,134 @@
 })();
 </script>
 
+<script>
+/* Acordeón "Cómo imprimir tus fotos", video tutorial con portada y scroll suave al armador. */
+(function () {
+  var sec = document.getElementById('como-imprimir');
+  var head = document.getElementById('howtoHead');
+  if (!sec || !head) return;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- video: portada -> click carga el video; luego click = pausa / play ---------- */
+  var vbox = document.getElementById('howtoVideo');
+  var facade = document.getElementById('videoFacade');
+  var soon = document.getElementById('videoSoon');
+  var box = facade ? facade.parentNode : null;
+  var player = null;          /* <video> o <iframe> actual */
+  var isNativeVideo = false;
+  var LABEL_PLAY = 'Reproducir video tutorial: cómo imprimir tus fotos';
+
+  function setPlaying(on) {
+    box.classList.toggle('is-playing', on);
+    facade.setAttribute('aria-label', on ? 'Pausar video' : (player ? 'Reproducir video' : LABEL_PLAY));
+  }
+
+  function startVideo() {
+    var mp4 = (vbox.dataset.mp4 || '').trim();
+    var webm = (vbox.dataset.webm || '').trim();
+    var yt = (vbox.dataset.youtubeId || '').trim();
+    var el;
+    if (mp4 || webm) {
+      /* Video propio (hosting del sitio): sin terceros, sin cookies, sin marca de YouTube. */
+      el = document.createElement('video');
+      el.controls = true;
+      el.setAttribute('controlslist', 'nodownload nofullscreen noplaybackrate');
+      el.playsInline = true;
+      el.preload = 'auto';
+      el.disablePictureInPicture = true;
+      if (vbox.dataset.poster) el.poster = vbox.dataset.poster;
+      var sources = [[webm, 'video/webm'], [mp4, 'video/mp4']].filter(function (x) { return x[0]; });
+      sources.forEach(function (x, i) {
+        var so = document.createElement('source');
+        so.src = x[0];
+        so.type = x[1];
+        /* si el último formato también falla (archivo no subido), vuelve la portada */
+        if (i === sources.length - 1) {
+          so.addEventListener('error', function () {
+            resetVideo();
+            if (soon) soon.hidden = false;
+          });
+        }
+        el.appendChild(so);
+      });
+      el.addEventListener('playing', function () { setPlaying(true); });
+      el.addEventListener('pause', function () { setPlaying(false); });
+      el.addEventListener('ended', function () { setPlaying(false); });
+      box.insertBefore(el, facade);
+      player = el;
+      isNativeVideo = true;
+      box.classList.add('is-started');
+      var pr = el.play();
+      if (pr && pr.catch) pr.catch(function () { setPlaying(false); });
+    } else if (yt) {
+      /* Alternativa: YouTube con lo mínimo activable. Requiere que el sitio envíe Referer
+         (si no, error 153); no funciona abriendo el archivo con file://. */
+      var id = encodeURIComponent(yt);
+      el = document.createElement('iframe');
+      el.src = 'https://www.youtube-nocookie.com/embed/' + id +
+               '?autoplay=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&rel=0&playsinline=1' +
+               '&loop=1&playlist=' + id;
+      el.referrerPolicy = 'strict-origin-when-cross-origin';
+      el.title = 'Video tutorial: cómo imprimir tus fotos';
+      el.allow = 'autoplay; encrypted-media';
+      box.appendChild(el);
+      facade.hidden = true;
+      player = el;
+      isNativeVideo = false;
+    } else {
+      if (soon) soon.hidden = false;   /* todavía no hay video configurado */
+    }
+  }
+
+  function onFacadeClick() {
+    if (!player) { startVideo(); return; }     /* primer click: carga y reproduce */
+    if (!isNativeVideo) return;
+    if (player.paused || player.ended) {       /* ya iniciado: alterna pausa / play */
+      var pr = player.play();
+      if (pr && pr.catch) pr.catch(function () {});
+    } else {
+      player.pause();
+    }
+  }
+
+  /* al cerrar el acordeón se detiene el video y vuelve la portada */
+  function resetVideo() {
+    if (player) player.remove();
+    player = null;
+    isNativeVideo = false;
+    if (box) box.classList.remove('is-started', 'is-playing');
+    if (facade) { facade.hidden = false; facade.setAttribute('aria-label', LABEL_PLAY); }
+  }
+  if (vbox && facade) facade.addEventListener('click', onFacadeClick);
+
+  /* ---------- acordeón ---------- */
+  function setOpen(open) {
+    sec.classList.toggle('is-open', open);
+    head.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (!open) resetVideo();
+  }
+  head.addEventListener('click', function () {
+    setOpen(!sec.classList.contains('is-open'));
+  });
+  /* el link "Cómo funciona" del footer abre el acordeón y baja hasta él */
+  document.querySelectorAll('a[href="#como-imprimir"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      setOpen(true);
+      sec.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    });
+  });
+
+  /* ---------- "Armar mi álbum": sube al armador con scroll suave ---------- */
+  document.querySelectorAll('.howto-cta').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var target = document.getElementById('album-wizard-main');
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    });
+  });
+})();
+</script>
 </body>
 </html>

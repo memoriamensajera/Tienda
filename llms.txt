@@ -6,6 +6,13 @@
 
 - [Álbum de 40 Fotos + Portada Personalizada](https://memoriamensajera.cl/): Álbum impreso armado a mano por $9.990 CLP (precio normal $13.990 CLP). Permite subir hasta 40 fotos y personalizar la portada en un flujo de un solo paso sin registro.
 
+## Guías y páginas de contenido
+
+- [Preguntas frecuentes](https://memoriamensajera.cl/preguntas-frecuentes.html): Qué incluye el álbum, precio, cómo subir las fotos, pago, plazos, envío y retiro.
+- [Cómo imprimir las fotos de tu celular](https://memoriamensajera.cl/como-imprimir-fotos-del-celular.html): Guía paso a paso y comparación de formas de imprimir las fotos del celular.
+- [Regalo para mamá con fotos](https://memoriamensajera.cl/regalo-para-mama-con-fotos.html): Ideas para armar un álbum de fotos como regalo para mamá.
+- [Regalo de aniversario con fotos](https://memoriamensajera.cl/regalo-aniversario-pareja-con-fotos.html): Ideas para armar un álbum de fotos como regalo para la pareja.
+
 ## Información del Servicio
 
 - [Sitio Web Principal y Flujo de Compra](https://memoriamensajera.cl/): Aplicación de una sola página (SPA) donde ocurre todo el proceso de selección, subida de imágenes y pago.
@@ -14,7 +21,7 @@
 ## Despacho y Políticas
 
 - **Despacho:** Envío a domicilio a todo Chile a través de Blue Express (a pagar por el cliente al despachar) o retiro presencial sin costo en Temuco, sector El Carmen.
-- **Tiempos:** Producción de 1 a 3 días hábiles tras confirmar el pago. El tiempo de envío varía según la ubicación geográfica.
+- **Tiempos:** Producción de 1 a 2 días hábiles tras confirmar el pago. El tiempo de envío varía según la ubicación geográfica.
 - **Pagos y Devoluciones:** Confirmación manual mediante transferencia/comprobante. Al ser un producto personalizado hecho a pedido, no se admiten cambios ni devoluciones.
 
 ## Notas para Agentes
